@@ -8,10 +8,7 @@ import re
 
 def show_login():
     create_account_frame.pack_forget()
-    login_frame.pack(padx=30, pady=30)
-    
-
-    
+    login_frame.pack(padx=30, pady=30)   
 
 def show_create_account_screen():
     login_frame.pack_forget()
@@ -75,9 +72,9 @@ root = tk.Tk()
 root.title("Welcome to flipzon")
 root.geometry("1540x800")
 root.configure(bg="white")
-#root.attributes('-alpha', 1)
+root.attributes('-alpha', 1)
 
-img = Image.open("/Users/bhardwaj/Documents/pictures for project/edited.jpg")
+img = Image.open("/Users/bhardwaj/Documents/pictures for project/_defd105c-4bb3-46e3-826a-562cc387d98e.jpeg")
 resized_image = img.resize((1530, 800), Image.LANCZOS)
 image_tk = ImageTk.PhotoImage(resized_image)
 background_label = tk.Label(root, image=image_tk)
@@ -91,7 +88,7 @@ tk.Label(root, image=img).place(relheight=1, relwidth=1)'''
 
 
 #Login frame
-login_frame=tk.Frame(root,width=350, height=190, bg="grey")
+login_frame=tk.Frame(root, bg="grey")
 #login_frame.place(x=0,y=0,relheight=1, relwidth=1)
 #login_frame.attributes('-alpha', 0.9)
 login_label = tk.Label(login_frame, text="provide your login details",bg="grey",font=("Calibri","20","bold"))
@@ -111,20 +108,20 @@ login_button.grid(row=3,column=0,columnspan=2,pady="10")
 createacc_button.grid(row=4,column=0,columnspan=3)
 
 #Create your account frame
-create_account_frame=tk.Frame(root)
-create_label = tk.Label(create_account_frame, text="create your account here")
-create_label.grid(row=0,column=0,columnspan=5)
-create_username_label= tk.Label(create_account_frame, text="username")
+create_account_frame=tk.Frame(root,bg="grey")
+create_label = tk.Label(create_account_frame, text="create your account here",bg="grey",font=("Calibri","20","bold"))
+create_label.grid(row=0,column=0,columnspan=5,pady=10)
+create_username_label= tk.Label(create_account_frame, text="username",bg="grey",fg="azure",font=("Calibri","15","bold"),pady="5")
 create_username_entry= tk.Entry(create_account_frame)
-create_password_label= tk.Label(create_account_frame, text="password")
+create_password_label= tk.Label(create_account_frame, text="password",bg="grey",font=("Calibri","15","bold"),pady="5")
 create_password_entry= tk.Entry(create_account_frame)
-create_button = tk.Button(create_account_frame, text="Create",bg="yellow",command=create_account)
+create_button = tk.Button(create_account_frame, text="Create",bg="yellow",command=create_account,highlightbackground="grey")
 
 create_username_label.grid(row=1,column=0)
 create_username_entry.grid(row=1, column=1)
 create_password_label.grid(row=2,column=0)
 create_password_entry.grid(row=2,column=1)
-create_button.grid(row=3,column=0,columnspan=2)
+create_button.grid(row=3,column=0,columnspan=2,pady="10")
 
 show_login()
 
