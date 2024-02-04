@@ -47,25 +47,99 @@ class flipzon:
         self.background_label.place(x=0, y=0, relwidth=1, relheight=1)
         #self.login_frame.place(x=327,y=370,width=390)
 
+        self.show_login()
+
     def show_login(self):
+        for i in self.root.winfo_children():
+            i.destroy()
+
+        self.background_label = tk.Label(root)
+        self.background_label.place(x=0, y=0, relwidth=1, relheight=1)
+
+        self.login_frame=tk.Frame(root, bg="grey")
+        #login_frame.place(x=0,y=0,relheight=1, relwidth=1)
+        #login_frame.attributes('-alpha', 0.9)
+        self.login_label = tk.Label(self.login_frame, text="provide your login details",bg="grey",font=("Calibri","20","bold"))
+        self.login_label.grid(row=0,column=0,columnspan=5,pady=10)
+        self.login_username_label= tk.Label(self.login_frame, text="username",bg="grey",fg="azure",font=("Calibri","15","bold"),pady=5)
+        self.login_username_entry= tk.Entry(self.login_frame)
+        self.login_password_label= tk.Label(self.login_frame, text="password",bg="grey",font=("Calibri","15","bold"))
+        self.login_password_entry= tk.Entry(self.login_frame)
+        self.login_button = Button(self.login_frame, text="Login",bg="#FFFF00",fg="black",command=self.login,highlightbackground="grey",borderless=1)
+        self.forgot_password_button = Button(self.login_frame, text="Forgot password?",bg="gold",fg="black",command=self.show_forgot_password_screen,highlightbackground="grey",borderless=1)
+        self.createacc_button=tk.Button(self.login_frame, text="New User? Create Your account",bg="yellow",fg="black",command=self.show_create_account_screen,highlightbackground="grey")
+
+        self.login_username_label.grid(row=1,column=0)
+        self.login_username_entry.grid(row=1, column=1)
+        self.login_password_label.grid(row=2,column=0)
+        self.login_password_entry.grid(row=2,column=1)
+        self.login_button.grid(row=3,column=0,columnspan=2,pady="10")
+        self.forgot_password_button.grid(row=4,column=0,columnspan=3)
+        self.createacc_button.grid(row=6,column=0,columnspan=3)
+        #self.l_frame()
         #self.destroy_background_image()
-        self.create_account_frame.pack_forget()
-        self.forgot_password_frame.pack_forget()
+        # self.create_account_frame.pack_forget()
+        # self.forgot_password_frame.pack_forget()
         self.login_frame.place(x=327,y=370,width=390)
         self.update_background_image("/Users/bhardwaj/Documents/pictures for project/_defd105c-4bb3-46e3-826a-562cc387d98e.jpeg")
         #self.login_frame.pack() 
 
     def show_create_account_screen(self):
         #self.destroy_background_image()
-        self.login_frame.place_forget()
-        self.forgot_password_frame.pack_forget()
+        for i in self.root.winfo_children():
+            i.destroy()
+
+        self.background_label = tk.Label(root)
+        self.background_label.place(x=0, y=0, relwidth=1, relheight=1)
+        self.create_account_frame=tk.Frame(root,bg="grey")
+        self.create_label = tk.Label(self.create_account_frame, text="create your account here",bg="grey",font=("Calibri","20","bold"))
+        self.create_label.grid(row=0,column=0,columnspan=5,pady=10)
+        self.create_username_label= tk.Label(self.create_account_frame, text="username",bg="grey",fg="azure",font=("Calibri","15","bold"),pady="5")
+        self.create_username_entry= tk.Entry(self.create_account_frame)
+        self.create_password_label= tk.Label(self.create_account_frame, text="password",bg="grey",font=("Calibri","15","bold"),pady="5")
+        self.create_password_entry= tk.Entry(self.create_account_frame)
+        self.create_button = tk.Button(self.create_account_frame, text="Create",bg="yellow",command=self.create_account,highlightbackground="grey")
+        self.create_back_login_button = tk.Button(self.create_account_frame, text="Back to login",bg="gold",command=self.show_login,highlightbackground="grey")
+
+        self.create_username_label.grid(row=1,column=0)
+        self.create_username_entry.grid(row=1, column=1)
+        self.create_password_label.grid(row=2,column=0)
+        self.create_password_entry.grid(row=2,column=1)
+        self.create_button.grid(row=3,column=0,columnspan=2,pady="10")
+        self.create_back_login_button.grid(row=4,column=0,columnspan=3)
         self.create_account_frame.pack()
+
         self.update_background_image("/Users/bhardwaj/Documents/pictures for project/force-majeure-du8AbwM5z2g-unsplash.jpg")
 
     def show_forgot_password_screen(self):
         #self.destroy_background_image()
-        self.login_frame.place_forget()
-        self.create_account_frame.pack_forget()
+        #self.create_account_frame.pack_forget()
+
+        for i in self.root.winfo_children():
+            i.destroy()
+        
+        self.background_label = tk.Label(root)
+        self.background_label.place(x=0, y=0, relwidth=1, relheight=1)
+        self.forgot_password_frame=tk.Frame(root,bg="grey")
+        self.forgot_label = tk.Label(self.forgot_password_frame, text="Forgot password",bg="grey",font=("Calibri","20","bold"))
+        self.forgot_label.grid(row=0,column=0,columnspan=5,pady=10)
+        self.flogin_username_label= tk.Label(self.forgot_password_frame, text="username",bg="grey",fg="azure",font=("Calibri","15","bold"),pady="5")
+        self.flogin_username_entry= tk.Entry(self.forgot_password_frame)
+        self.flogin_password_label= tk.Label(self.forgot_password_frame, text="new password",bg="grey",font=("Calibri","15","bold"),pady="5")
+        self.flogin_password_entry= tk.Entry(self.forgot_password_frame)
+        self.flogin_confirm_password_label= tk.Label(self.forgot_password_frame, text="confirm password",bg="grey",font=("Calibri","15","bold"),pady="5")
+        self.flogin_confirm_password_entry= tk.Entry(self.forgot_password_frame)
+        self.flogin_button = tk.Button(self.forgot_password_frame, text="Update",bg="yellow",command=self.forgot_password,highlightbackground="grey")
+        self.flogin_back_login_button = tk.Button(self.forgot_password_frame, text="Back to login",bg="gold",command=self.show_login,highlightbackground="grey")
+
+        self.flogin_username_label.grid(row=1,column=0)
+        self.flogin_username_entry.grid(row=1, column=1)
+        self.flogin_password_label.grid(row=2,column=0)
+        self.flogin_password_entry.grid(row=2,column=1)
+        self.flogin_confirm_password_label.grid(row=3,column=0)
+        self.flogin_confirm_password_entry.grid(row=3,column=1)
+        self.flogin_button.grid(row=5,column=0,columnspan=2,pady="10")
+        self.flogin_back_login_button.grid(row=6,column=0,columnspan=3)
         self.forgot_password_frame.pack()
         self.update_background_image("/Users/bhardwaj/Documents/pictures for project/eileen-pan-5d5DSRQ5dUc-unsplash.jpg")
 
@@ -222,81 +296,13 @@ class flipzon:
 # '''img = ImageTk.PhotoImage(Image.open("/Users/bhardwaj/Documents/pictures for project/force-majeure-du8AbwM5z2g-unsplash.jpg"))
 # tk.Label(root, image=img).place(relheight=1, relwidth=1)'''
 
-
-
-
-#Login frame
-    def l_frame(self):
-        self.login_frame=tk.Frame(root, bg="grey")
-        #login_frame.place(x=0,y=0,relheight=1, relwidth=1)
-        #login_frame.attributes('-alpha', 0.9)
-        self.login_label = tk.Label(self.login_frame, text="provide your login details",bg="grey",font=("Calibri","20","bold"))
-        self.login_label.grid(row=0,column=0,columnspan=5,pady=10)
-        self.login_username_label= tk.Label(self.login_frame, text="username",bg="grey",fg="azure",font=("Calibri","15","bold"),pady=5)
-        self.login_username_entry= tk.Entry(self.login_frame)
-        self.login_password_label= tk.Label(self.login_frame, text="password",bg="grey",font=("Calibri","15","bold"))
-        self.login_password_entry= tk.Entry(self.login_frame)
-        self.login_button = Button(self.login_frame, text="Login",bg="#FFFF00",fg="black",command=self.login,highlightbackground="grey",borderless=1)
-        self.forgot_password_button = Button(self.login_frame, text="Forgot password?",bg="gold",fg="black",command=self.show_forgot_password_screen,highlightbackground="grey",borderless=1)
-        self.createacc_button=tk.Button(self.login_frame, text="New User? Create Your account",bg="yellow",fg="black",command=self.show_create_account_screen,highlightbackground="grey")
-
-        self.login_username_label.grid(row=1,column=0)
-        self.login_username_entry.grid(row=1, column=1)
-        self.login_password_label.grid(row=2,column=0)
-        self.login_password_entry.grid(row=2,column=1)
-        self.login_button.grid(row=3,column=0,columnspan=2,pady="10")
-        self.forgot_password_button.grid(row=4,column=0,columnspan=3)
-        self.createacc_button.grid(row=6,column=0,columnspan=3)
-
-    #Create your account frame
-    def c_frame(self):
-        self.create_account_frame=tk.Frame(root,bg="grey")
-        self.create_label = tk.Label(self.create_account_frame, text="create your account here",bg="grey",font=("Calibri","20","bold"))
-        self.create_label.grid(row=0,column=0,columnspan=5,pady=10)
-        self.create_username_label= tk.Label(self.create_account_frame, text="username",bg="grey",fg="azure",font=("Calibri","15","bold"),pady="5")
-        self.create_username_entry= tk.Entry(self.create_account_frame)
-        self.create_password_label= tk.Label(self.create_account_frame, text="password",bg="grey",font=("Calibri","15","bold"),pady="5")
-        self.create_password_entry= tk.Entry(self.create_account_frame)
-        self.create_button = tk.Button(self.create_account_frame, text="Create",bg="yellow",command=self.create_account,highlightbackground="grey")
-        self.create_back_login_button = tk.Button(self.create_account_frame, text="Back to login",bg="gold",command=self.show_login,highlightbackground="grey")
-
-        self.create_username_label.grid(row=1,column=0)
-        self.create_username_entry.grid(row=1, column=1)
-        self.create_password_label.grid(row=2,column=0)
-        self.create_password_entry.grid(row=2,column=1)
-        self.create_button.grid(row=3,column=0,columnspan=2,pady="10")
-        self.create_back_login_button.grid(row=4,column=0,columnspan=3)
-    
-    #Forgot password frame
-    def f_frame(self):
-        self.forgot_password_frame=tk.Frame(root,bg="grey")
-        self.forgot_label = tk.Label(self.forgot_password_frame, text="Forgot password",bg="grey",font=("Calibri","20","bold"))
-        self.forgot_label.grid(row=0,column=0,columnspan=5,pady=10)
-        self.flogin_username_label= tk.Label(self.forgot_password_frame, text="username",bg="grey",fg="azure",font=("Calibri","15","bold"),pady="5")
-        self.flogin_username_entry= tk.Entry(self.forgot_password_frame)
-        self.flogin_password_label= tk.Label(self.forgot_password_frame, text="new password",bg="grey",font=("Calibri","15","bold"),pady="5")
-        self.flogin_password_entry= tk.Entry(self.forgot_password_frame)
-        self.flogin_confirm_password_label= tk.Label(self.forgot_password_frame, text="confirm password",bg="grey",font=("Calibri","15","bold"),pady="5")
-        self.flogin_confirm_password_entry= tk.Entry(self.forgot_password_frame)
-        self.flogin_button = tk.Button(self.forgot_password_frame, text="Update",bg="yellow",command=self.forgot_password,highlightbackground="grey")
-        self.flogin_back_login_button = tk.Button(self.forgot_password_frame, text="Back to login",bg="gold",command=self.show_login,highlightbackground="grey")
-
-        self.flogin_username_label.grid(row=1,column=0)
-        self.flogin_username_entry.grid(row=1, column=1)
-        self.flogin_password_label.grid(row=2,column=0)
-        self.flogin_password_entry.grid(row=2,column=1)
-        self.flogin_confirm_password_label.grid(row=3,column=0)
-        self.flogin_confirm_password_entry.grid(row=3,column=1)
-        self.flogin_button.grid(row=5,column=0,columnspan=2,pady="10")
-        self.flogin_back_login_button.grid(row=6,column=0,columnspan=3)
-
 if __name__ == "__main__":
     root = tk.Tk()
     app = flipzon(root)
     
-    app.l_frame()
-    app.c_frame()
-    app.f_frame()
-    app.show_login()
+    # app.l_frame()
+    # app.c_frame()
+    # app.f_frame()
+    # app.show_login()
     root.mainloop()
 
