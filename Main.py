@@ -4,11 +4,11 @@ import mysql.connector as sql
 from mysql.connector import Error
 from PIL import Image, ImageTk
 from tkmacosx import Button
-#from tkinter import ttk
+from tkinter import ttk
 import os
 import re
 
-flipzondb = sql.connect(
+conn = sql.connect(
     host="localhost",
     user="root",
     password="0139612345",
@@ -18,8 +18,8 @@ flipzondb = sql.connect(
 create_userdetails_table = """
 CREATE TABLE IF NOT EXISTS user_details (  
     user_id INT AUTO_INCREMENT PRIMARY KEY,
-    first_name VARCHAR(100) NOT NULL,
-    last_name VARCHAR(100) NOT NULL,
+    firstname VARCHAR(100) NOT NULL,
+    lastname VARCHAR(100) NOT NULL,
     phone VARCHAR(100) NOT NULL,
     address VARCHAR(100) NOT NULL,
     email VARCHAR(100) NOT NULL,
@@ -29,8 +29,11 @@ CREATE TABLE IF NOT EXISTS user_details (
 """
 
 #executing the query
-cursor = flipzondb.cursor()
+cursor = conn.cursor()
 cursor.execute(create_userdetails_table)
+conn.commit()
+conn.close()
+
 
 
 class flipzon:
@@ -51,6 +54,8 @@ class flipzon:
         self.background_label.image = image_tk  # Keep a reference
         self.background_label.place(x=0, y=0, relwidth=1, relheight=1)
         #self.login_frame.place(x=327,y=370,width=390)
+
+        #cursor=conn.cursor()
 
         self.show_login()
 
@@ -78,9 +83,9 @@ class flipzon:
         self.login_username_entry.grid(row=1, column=2)
         self.login_password_label.grid(row=2,column=1)
         self.login_password_entry.grid(row=2,column=2)
-        self.login_button.grid(row=3,column=2,columnspan=2,pady="10")
-        self.forgot_password_button.grid(row=4,column=2,columnspan=3)
-        self.createacc_button.grid(row=7,column=2,columnspan=3)
+        self.login_button.grid(row=3,column=2,pady="10")
+        self.forgot_password_button.grid(row=4,column=2,padx=5)
+        self.createacc_button.grid(row=7,column=2,columnspan=3,pady="10")
         #self.l_frame()
         #self.destroy_background_image()
         # self.create_account_frame.pack_forget()
@@ -132,7 +137,7 @@ class flipzon:
         self.create_password_entry.grid(row=7,column=1)
         self.create_button.grid(row=9,column=0,columnspan=2,pady="10")
         self.create_back_login_button.grid(row=10,column=0,columnspan=3)
-        self.create_account_frame.place(x=230,y=150,height=700,width=550)
+        self.create_account_frame.place(x=230,y=160,height=550,width=550)
         # self.frame1=Frame(self.app,width=700,height=450,bg="white")
         # self.frame1.place(x=180,y=90)
 
@@ -147,17 +152,17 @@ class flipzon:
         
         self.background_label = tk.Label(root)
         self.background_label.place(x=0, y=0, relwidth=1, relheight=1)
-        self.forgot_password_frame=tk.Frame(root,bg="grey")
-        self.forgot_label = tk.Label(self.forgot_password_frame, text="Forgot password",bg="grey",font=("Calibri","20","bold"))
+        self.forgot_password_frame=tk.Frame(root,bg="gray1")
+        self.forgot_label = tk.Label(self.forgot_password_frame, text="Forgot password",bg="black",font=("Calibri","20","bold"))
         self.forgot_label.grid(row=0,column=0,columnspan=5,pady=10)
-        self.flogin_username_label= tk.Label(self.forgot_password_frame, text="username",bg="grey",fg="azure",font=("Calibri","15","bold"),pady="5")
+        self.flogin_username_label= tk.Label(self.forgot_password_frame, text="username",bg="black",fg="azure",font=("Calibri","15","bold"),pady="5")
         self.flogin_username_entry= tk.Entry(self.forgot_password_frame)
-        self.flogin_password_label= tk.Label(self.forgot_password_frame, text="new password",bg="grey",font=("Calibri","15","bold"),pady="5")
+        self.flogin_password_label= tk.Label(self.forgot_password_frame, text="new password",bg="black",font=("Calibri","15","bold"),pady="5")
         self.flogin_password_entry= tk.Entry(self.forgot_password_frame)
-        self.flogin_confirm_password_label= tk.Label(self.forgot_password_frame, text="confirm password",bg="grey",font=("Calibri","15","bold"),pady="5")
+        self.flogin_confirm_password_label= tk.Label(self.forgot_password_frame, text="confirm password",bg="black",font=("Calibri","15","bold"),pady="5")
         self.flogin_confirm_password_entry= tk.Entry(self.forgot_password_frame)
-        self.flogin_button = tk.Button(self.forgot_password_frame, text="Update",bg="yellow",command=self.forgot_password,highlightbackground="grey")
-        self.flogin_back_login_button = tk.Button(self.forgot_password_frame, text="Back to login",bg="gold",command=self.show_login,highlightbackground="grey")
+        self.flogin_button = Button(self.forgot_password_frame, text="Update",bg="cyan",command=self.forgot_password,highlightbackground="grey",borderless=1)
+        self.flogin_back_login_button = Button(self.forgot_password_frame, text="Back to login",bg="cyan",command=self.show_login,highlightbackground="grey",borderless=1)
 
         self.flogin_username_label.grid(row=1,column=0)
         self.flogin_username_entry.grid(row=1, column=1)
@@ -167,8 +172,8 @@ class flipzon:
         self.flogin_confirm_password_entry.grid(row=3,column=1)
         self.flogin_button.grid(row=5,column=0,columnspan=2,pady="10")
         self.flogin_back_login_button.grid(row=6,column=0,columnspan=3)
-        self.forgot_password_frame.pack()
-        self.update_background_image("/Users/bhardwaj/Documents/pictures for project/eileen-pan-5d5DSRQ5dUc-unsplash.jpg")
+        self.forgot_password_frame.place(x=327,y=280,width=390)
+        self.update_background_image("/Users/bhardwaj/Downloads/_0f134ab2-ff1b-491d-94e7-a7b0e40ac860.jpeg")
 
 #Function to create account
     def create_account(self):
@@ -183,17 +188,17 @@ class flipzon:
         if c_username == "" or c_password == "" :
             mb.showinfo(title = "Fields are empty",message="create a username and password for your account" )
         else:
-            #con = sql.connect(host="localhost", user="root", password="0139612345", database="login_details")
-            cursor=flipzondb.cursor()
+            con = sql.connect(host="localhost", user="root", password="0139612345", database="login_details")
+            cursor=con.cursor()
             #cursor.execute("CREATE TABLE IF NOT EXISTS users (username VARCHAR(255), password VARCHAR(255))")
 
             # Insert data into the table
-            cursor.execute("INSERT INTO user_details (first_name, last_name,phone,address,email,username, password) VALUES (%s, %s, %s, %s, %s, %s)", (c_firstname,c_lastname,c_phone,c_address,c_email,c_username, c_password))
+            cursor.execute("INSERT INTO user_details (firstname, lastname, phone, address, email, username, password) VALUES (%s, %s, %s, %s, %s, %s,%s)", (c_firstname,c_lastname,c_phone,c_address,c_email,c_username, c_password))
 
         
-            flipzondb.commit()
+            con.commit()
             mb.showinfo(title="created account status",message="successful")
-            flipzondb.close()
+            con.close()
 
 #Function for login
     def login(self):
@@ -201,23 +206,29 @@ class flipzon:
         e_username=self.login_username_entry.get()
         e_password=self.login_password_entry.get()
 
+        #con = sql.connect(host="localhost", user="root", password="0139612345", database="login_details")
+        
+
         if e_username == "" or e_password == "":
             mb.showinfo(title = "Fields are empty",message="create a username and password for your account" )
         else:
-            #con = sql.connect(host="localhost", user="root", password="0139612345", database="login_details")
-            cursor=flipzondb.cursor()
+            con = sql.connect(host="localhost", user="root", password="0139612345", database="login_details")
+            cursor=con.cursor()
             cursor.execute("SELECT * FROM user_details WHERE username = %s AND password = %s", (e_username, e_password))
             data = cursor.fetchone()
 
             if data:
                 mb.showinfo(title="Login successful", message="Welcome, " + e_username)
+                self.catalog()
             else:
                 mb.showinfo(title = "Login Usuccessful",message="Username or Password are incorrect. If you are new user create a new account" )
     
     #function to update password
     def forgot_password(self):
+        con = sql.connect(host="localhost", user="root", password="0139612345", database="login_details")
+        cursor=con.cursor()
         f_username= self.flogin_username_entry.get()
-        cursor=flipzondb.cursor()
+        
         #try:
         cursor.execute("SELECT * from user_details WHERE username=%s", (f_username,))
         data = cursor.fetchone()
@@ -229,9 +240,9 @@ class flipzon:
             if f_username and f_password and confirm_new_password:
                 if f_password == confirm_new_password:
                     #try:
-                    cursor = flipzondb.cursor()
+                    #cursor = con.cursor()
                     cursor.execute("UPDATE user_details SET password=%s WHERE username=%s", (f_password, f_username))
-                    flipzondb.commit()
+                    con.commit()
                     mb.showinfo("Success", "Password updated successfully")
                     #self.login_page()
                 #except Error as e:
@@ -304,6 +315,60 @@ class flipzon:
     def destroy_background_image(self):
         if hasattr(self, 'background_label') and self.background_label.winfo_exists():
              self.background_label.destroy()
+
+    #function to create a caatalog of products using notebook
+    def catalog(self):
+        for i in self.root.winfo_children():
+            i.destroy()
+
+        notebook = ttk.Notebook(self.root)
+        
+        frame1 = tk.Frame(notebook)
+        frame2 = tk.Frame(notebook)
+        frame3 = tk.Frame(notebook)
+
+        notebook.add(frame1, text="Men Shoes")
+        notebook.add(frame2, text="Women Shoes")
+        notebook.add(frame3, text="Kids Shoes")
+        notebook.pack(expand=True, fill="both")
+
+        #frame1
+        img1 = Image.open("/Users/bhardwaj/Documents/pictures for project/mike-petrucci-c9FQyqIECds-unsplash.jpg")
+        resized_image1 = img1.resize((1035, 850), Image.LANCZOS)
+        image_tk1 = ImageTk.PhotoImage(resized_image1)
+        background_label1 = tk.Label(frame1, image=image_tk1)
+        background_label1.image = image_tk1
+        background_label1.place(x=0, y=0, relwidth=1, relheight=1)
+        title1 = tk.Label(frame1, text="MEN SHOES", font=("Helvetica", 20, "bold"), bg="black", fg="white")
+        title1.place(x=450, y=10)
+
+        
+
+        #frame2
+        img2 = Image.open("/Users/bhardwaj/Documents/pictures for project/women_shoes.png")
+        resized_image2 = img2.resize((1035, 850), Image.LANCZOS)
+        image_tk2 = ImageTk.PhotoImage(resized_image2)
+        background_label2 = tk.Label(frame2, image=image_tk2)
+        background_label2.image = image_tk2
+        background_label2.place(x=0, y=0, relwidth=1, relheight=1)
+        title2 = tk.Label(frame2, text="WOMEN SHOES", font=("Helvetica", 20, "bold"), bg="black", fg="white")
+        title2.place(x=450, y=10)
+
+        #frame3
+        img3 = Image.open("/Users/bhardwaj/Documents/pictures for project/kids_shoes.png")
+        resized_image3 = img3.resize((1035, 850), Image.LANCZOS)
+        image_tk3 = ImageTk.PhotoImage(resized_image3)
+        background_label3 = tk.Label(frame3, image=image_tk3)
+        background_label3.image = image_tk3
+        background_label3.place(x=0, y=0, relwidth=1, relheight=1)
+        title3 = tk.Label(frame3, text="KIDS SHOES", font=("Helvetica", 20, "bold"), bg="black", fg="white")
+        title3.place(x=450, y=10)
+
+
+
+
+
+        
 
 
    # if username == "" or password == "" :
