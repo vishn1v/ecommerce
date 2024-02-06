@@ -321,49 +321,249 @@ class flipzon:
         for i in self.root.winfo_children():
             i.destroy()
 
-        notebook = ttk.Notebook(self.root)
+        self.notebook = ttk.Notebook(self.root)
         
-        frame1 = tk.Frame(notebook)
-        frame2 = tk.Frame(notebook)
-        frame3 = tk.Frame(notebook)
+        self.frame1 = tk.Frame(self.notebook)
+        self.frame2 = tk.Frame(self.notebook)
+        self.frame3 = tk.Frame(self.notebook)
 
-        notebook.add(frame1, text="Men Shoes")
-        notebook.add(frame2, text="Women Shoes")
-        notebook.add(frame3, text="Kids Shoes")
-        notebook.pack(expand=True, fill="both")
+        self.notebook.add(self.frame1, text="Men Shoes")
+        self.notebook.add(self.frame2, text="Women Shoes")
+        self.notebook.add(self.frame3, text="Kids Shoes")
+        self.notebook.pack(expand=True, fill="both")
 
         #frame1
-        img1 = Image.open("/Users/bhardwaj/Documents/pictures for project/mike-petrucci-c9FQyqIECds-unsplash.jpg")
-        resized_image1 = img1.resize((1035, 850), Image.LANCZOS)
-        image_tk1 = ImageTk.PhotoImage(resized_image1)
-        background_label1 = tk.Label(frame1, image=image_tk1)
-        background_label1.image = image_tk1
-        background_label1.place(x=0, y=0, relwidth=1, relheight=1)
-        title1 = tk.Label(frame1, text="MEN SHOES", font=("Helvetica", 20, "bold"), bg="black", fg="white")
-        title1.place(x=450, y=10)
+        # self.img1 = Image.open("/Users/bhardwaj/Documents/pictures for project/mike-petrucci-c9FQyqIECds-unsplash.jpg")
+        # self.resized_image1 = self.img1.resize((1035, 850), Image.LANCZOS)
+        # self.image_tk1 = ImageTk.PhotoImage(self.resized_image1)
+        # self.background_label1 = tk.Label(self.frame1, image=self.image_tk1)
+        # self.background_label1.image = self.image_tk1
+        # self.background_label1.place(x=0, y=0, relwidth=1, relheight=1)
+        # self.title1 = tk.Label(self.frame1, text="MEN SHOES", font=("Helvetica", 20, "bold"), bg="black", fg="white")
+        # self.title1.place(x=450, y=10)
+
+        self.Canvas= tk.Canvas(self.frame1, bg="black", height=850, width=1035)
+        self.Canvas.place(x=0, y=0, relwidth=1, relheight=1)
+        self.Shoes1img = Image.open("/Users/bhardwaj/Documents/pictures for project/men_shoes1.jpeg")
+        self.Shoes1img = self.Shoes1img.resize((200, 200), Image.LANCZOS)
+        self.Shoes1img = ImageTk.PhotoImage(self.Shoes1img)
+        self.Shoes1 = tk.Label(self.Canvas, image=self.Shoes1img, bg="black")
+        self.Shoes1.image = self.Shoes1img
+        self.Shoes1.place(x=50, y=50)
+        self.Shoes1title = tk.Label(self.Canvas, text="Shoes 1", font=("Helvetica", 15, "bold"), bg="black", fg="white")
+        self.Shoes1title.place(x=50, y=250)
+        self.Shoes1price = tk.Label(self.Canvas, text="Price: $50", font=("Helvetica", 15, "bold"), bg="black", fg="white")
+        self.Shoes1price.place(x=50, y=280)
+        #dropdown menu for size
+        self.Shoes1size = ttk.Combobox(self.Canvas, values=[7, 8, 9, 10, 11, 12], state="readonly")
+        self.Shoes1size.place(x=50, y=310)
+        self.Shoes1size.set("Select Size")
+
+        self.Shoes1button = Button(self.Canvas, text="Add to Cart", bg="yellow", fg="black", highlightbackground="black", borderless=1)
+        self.Shoes1button.place(x=50, y=350)
+
+        self.Shoes2img = Image.open("/Users/bhardwaj/Documents/pictures for project/men_shoes3.jpeg")
+        self.Shoes2img = self.Shoes2img.resize((200, 200), Image.LANCZOS)
+        self.Shoes2img = ImageTk.PhotoImage(self.Shoes2img)
+        self.Shoes2 = tk.Label(self.Canvas, image=self.Shoes2img, bg="black")
+        self.Shoes2.image = self.Shoes2img
+        self.Shoes2.place(x=300, y=50)
+        self.Shoes2title = tk.Label(self.Canvas, text="Shoes 2", font=("Helvetica", 15, "bold"), bg="black", fg="white")
+        self.Shoes2title.place(x=300, y=250)
+        self.Shoes2price = tk.Label(self.Canvas, text="Price: $60", font=("Helvetica", 15, "bold"), bg="black", fg="white")
+        self.Shoes2price.place(x=300, y=280)
+        #dropdown menu for size
+        self.Shoes2size = ttk.Combobox(self.Canvas, values=[7, 8, 9, 10, 11, 12], state="readonly")
+        self.Shoes2size.place(x=300, y=310)
+        self.Shoes2size.set("Select Size")
+        self.Shoes2button = Button(self.Canvas, text="Add to Cart", bg="yellow", fg="black", highlightbackground="black", borderless=1)
+        self.Shoes2button.place(x=300, y=350)
+
+        self.Shoes3img = Image.open("/Users/bhardwaj/Documents/pictures for project/jordans.jpeg")
+        self.Shoes3img = self.Shoes3img.resize((200, 200), Image.LANCZOS)
+        self.Shoes3img = ImageTk.PhotoImage(self.Shoes3img)
+        self.Shoes3 = tk.Label(self.Canvas, image=self.Shoes3img, bg="black")
+        self.Shoes3.image = self.Shoes3img
+        self.Shoes3.place(x=550, y=50)
+        self.Shoes3title = tk.Label(self.Canvas, text="Shoes 3", font=("Helvetica", 15, "bold"), bg="black", fg="white")
+        self.Shoes3title.place(x=550, y=250)
+        self.Shoes3price = tk.Label(self.Canvas, text="Price: $100", font=("Helvetica", 15, "bold"), bg="black", fg="white")
+        self.Shoes3price.place(x=550, y=280)
+        #dropdown menu for size
+        self.Shoes3size = ttk.Combobox(self.Canvas, values=[7, 8, 9, 10, 11, 12], state="readonly")
+        self.Shoes3size.place(x=550, y=310)
+        self.Shoes3size.set("Select Size")
+        self.Shoes3button = Button(self.Canvas, text="Add to Cart", bg="yellow", fg="black", highlightbackground="black", borderless=1)
+        self.Shoes3button.place(x=550, y=350)
+
+        self.Shoes4img = Image.open("/Users/bhardwaj/Documents/pictures for project/footballshoes.jpeg")
+        self.Shoes4img = self.Shoes4img.resize((200, 200), Image.LANCZOS)
+        self.Shoes4img = ImageTk.PhotoImage(self.Shoes4img)
+        self.Shoes4 = tk.Label(self.Canvas, image=self.Shoes4img, bg="black")
+        self.Shoes4.image = self.Shoes4img
+        self.Shoes4.place(x=800, y=50)
+        self.Shoes4title = tk.Label(self.Canvas, text="Shoes 4", font=("Helvetica", 15, "bold"), bg="black", fg="white")
+        self.Shoes4title.place(x=800, y=250)
+        self.Shoes4price = tk.Label(self.Canvas, text="Price: $80", font=("Helvetica", 15, "bold"), bg="black", fg="white")
+        self.Shoes4price.place(x=800, y=280)
+        #dropdown menu for size
+        self.Shoes4size = ttk.Combobox(self.Canvas, values=[7, 8, 9, 10, 11, 12], state="readonly")
+        self.Shoes4size.place(x=800, y=310)
+        self.Shoes4size.set("Select Size")
+        self.Shoes4button = Button(self.Canvas, text="Add to Cart", bg="yellow", fg="black", highlightbackground="black", borderless=1)
+        self.Shoes4button.place(x=800, y=350)
 
         
 
         #frame2
-        img2 = Image.open("/Users/bhardwaj/Documents/pictures for project/women_shoes.png")
-        resized_image2 = img2.resize((1035, 850), Image.LANCZOS)
-        image_tk2 = ImageTk.PhotoImage(resized_image2)
-        background_label2 = tk.Label(frame2, image=image_tk2)
-        background_label2.image = image_tk2
-        background_label2.place(x=0, y=0, relwidth=1, relheight=1)
-        title2 = tk.Label(frame2, text="WOMEN SHOES", font=("Helvetica", 20, "bold"), bg="black", fg="white")
-        title2.place(x=450, y=10)
+        # self.img2 = Image.open("/Users/bhardwaj/Documents/pictures for project/women_shoes.png")
+        # self.resized_image2 = self.img2.resize((1035, 850), Image.LANCZOS)
+        # self.image_tk2 = ImageTk.PhotoImage(self.resized_image2)
+        # self.background_label2 = tk.Label(self.frame2, image=self.image_tk2)
+        # self.background_label2.image = self.image_tk2
+        # self.background_label2.place(x=0, y=0, relwidth=1, relheight=1)
+        # self.title2 = tk.Label(self.frame2, text="WOMEN SHOES", font=("Helvetica", 20, "bold"), bg="black", fg="white")
+        # self.title2.place(x=450, y=10)
+
+        self.Canvas2= tk.Canvas(self.frame2, bg="black", height=850, width=1035)
+        self.Canvas2.place(x=0, y=0, relwidth=1, relheight=1)
+        self.Shoes5img = Image.open("/Users/bhardwaj/Documents/pictures for project/women_shoes1.webp")
+        self.Shoes5img = self.Shoes5img.resize((200, 200), Image.LANCZOS)
+        self.Shoes5img = ImageTk.PhotoImage(self.Shoes5img)
+        self.Shoes5 = tk.Label(self.Canvas2, image=self.Shoes5img, bg="black")
+        self.Shoes5.image = self.Shoes5img
+        self.Shoes5.place(x=50, y=50)
+        self.Shoes5title = tk.Label(self.Canvas2, text="Shoes 5", font=("Helvetica", 15, "bold"), bg="black", fg="white")
+        self.Shoes5title.place(x=50, y=250)
+        self.Shoes5price = tk.Label(self.Canvas2, text="Price: $50", font=("Helvetica", 15, "bold"), bg="black", fg="white")
+        self.Shoes5price.place(x=50, y=280)
+        #dropdown menu for size
+        self.Shoes5size = ttk.Combobox(self.Canvas2, values=[7, 8, 9, 10, 11, 12], state="readonly")
+        self.Shoes5size.place(x=50, y=310)
+        self.Shoes5size.set("Select Size")
+        self.Shoes5button = Button(self.Canvas2, text="Add to Cart", bg="yellow", fg="black", highlightbackground="black", borderless=1)
+        self.Shoes5button.place(x=50, y=350)
+
+        self.Shoes6img = Image.open("/Users/bhardwaj/Documents/pictures for project/women_shoes3.jpeg")
+        self.Shoes6img = self.Shoes6img.resize((200, 200), Image.LANCZOS)
+        self.Shoes6img = ImageTk.PhotoImage(self.Shoes6img)
+        self.Shoes6 = tk.Label(self.Canvas2, image=self.Shoes6img, bg="black")
+        self.Shoes6.image = self.Shoes6img
+        self.Shoes6.place(x=300, y=50)
+        self.Shoes6title = tk.Label(self.Canvas2, text="Shoes 6", font=("Helvetica", 15, "bold"), bg="black", fg="white")
+        self.Shoes6title.place(x=300, y=250)
+        self.Shoes6price = tk.Label(self.Canvas2, text="Price: $60", font=("Helvetica", 15, "bold"), bg="black", fg="white")
+        self.Shoes6price.place(x=300, y=280)
+        #dropdown menu for size
+        self.Shoes6size = ttk.Combobox(self.Canvas2, values=[7, 8, 9, 10, 11, 12], state="readonly")
+        self.Shoes6size.place(x=300, y=310)
+        self.Shoes6size.set("Select Size")
+        self.Shoes6button = Button(self.Canvas2, text="Add to Cart", bg="yellow", fg="black", highlightbackground="black", borderless=1)
+        self.Shoes6button.place(x=300, y=350)
+
+        self.Shoes7img = Image.open("/Users/bhardwaj/Documents/pictures for project/women_shoes2.webp")
+        self.Shoes7img = self.Shoes7img.resize((200, 200), Image.LANCZOS)
+        self.Shoes7img = ImageTk.PhotoImage(self.Shoes7img)
+        self.Shoes7 = tk.Label(self.Canvas2, image=self.Shoes7img, bg="black")
+        self.Shoes7.image = self.Shoes7img
+        self.Shoes7.place(x=550, y=50)
+        self.Shoes7title = tk.Label(self.Canvas2, text="Shoes 7", font=("Helvetica", 15, "bold"), bg="black", fg="white")
+        self.Shoes7title.place(x=550, y=250)
+        self.Shoes7price = tk.Label(self.Canvas2, text="Price: $100", font=("Helvetica", 15, "bold"), bg="black", fg="white")
+        self.Shoes7price.place(x=550, y=280)
+        #dropdown menu for size
+        self.Shoes7size = ttk.Combobox(self.Canvas2, values=[7, 8, 9, 10, 11, 12], state="readonly")
+        self.Shoes7size.place(x=550, y=310)
+        self.Shoes7size.set("Select Size")
+        self.Shoes7button = Button(self.Canvas2, text="Add to Cart", bg="yellow", fg="black", highlightbackground="black", borderless=1)
+        self.Shoes7button.place(x=550, y=350)
+
+        self.Shoes8img = Image.open("/Users/bhardwaj/Documents/pictures for project/womenshoes5.webp")
+        self.Shoes8img = self.Shoes8img.resize((200, 200), Image.LANCZOS)
+        self.Shoes8img = ImageTk.PhotoImage(self.Shoes8img)
+        self.Shoes8 = tk.Label(self.Canvas2, image=self.Shoes8img, bg="black")
+        self.Shoes8.image = self.Shoes8img
+        self.Shoes8.place(x=800, y=50)
+        self.Shoes8title = tk.Label(self.Canvas2, text="Shoes 8", font=("Helvetica", 15, "bold"), bg="black", fg="white")
+        self.Shoes8title.place(x=800, y=250)
+        self.Shoes8price = tk.Label(self.Canvas2, text="Price: $80", font=("Helvetica", 15, "bold"), bg="black", fg="white")
+        self.Shoes8price.place(x=800, y=280)
+        #dropdown menu for size
+        self.Shoes8size = ttk.Combobox(self.Canvas2, values=[7, 8, 9, 10, 11, 12], state="readonly")
+        self.Shoes8size.place(x=800, y=310)
+        self.Shoes8size.set("Select Size")
+        self.Shoes8button = Button(self.Canvas2, text="Add to Cart", bg="yellow", fg="black", highlightbackground="black", borderless=1)
+        self.Shoes8button.place(x=800, y=350)
+
+
+
 
         #frame3
-        img3 = Image.open("/Users/bhardwaj/Documents/pictures for project/kids_shoes.png")
-        resized_image3 = img3.resize((1035, 850), Image.LANCZOS)
-        image_tk3 = ImageTk.PhotoImage(resized_image3)
-        background_label3 = tk.Label(frame3, image=image_tk3)
-        background_label3.image = image_tk3
-        background_label3.place(x=0, y=0, relwidth=1, relheight=1)
-        title3 = tk.Label(frame3, text="KIDS SHOES", font=("Helvetica", 20, "bold"), bg="black", fg="white")
-        title3.place(x=450, y=10)
+        # self.img3 = Image.open("/Users/bhardwaj/Documents/pictures for project/kids_shoes.png")
+        # self.resized_image3 = self.img3.resize((1035, 850), Image.LANCZOS)
+        # self.image_tk3 = ImageTk.PhotoImage(self.resized_image3)
+        # self.background_label3 = tk.Label(self.frame3, image=self.image_tk3)
+        # self.background_label3.image = self.image_tk3
+        # self.background_label3.place(x=0, y=0, relwidth=1, relheight=1)
+        # self.title3 = tk.Label(self.frame3, text="KIDS SHOES", font=("Helvetica", 20, "bold"), bg="black", fg="white")
+        # self.title3.place(x=450, y=10)
 
+        self.Canvas3= tk.Canvas(self.frame3, bg="black", height=850, width=1035)
+        self.Canvas3.place(x=0, y=0, relwidth=1, relheight=1)
+        self.Shoes9img = Image.open("/Users/bhardwaj/Documents/pictures for project/kids_shoes.jpg")
+        self.Shoes9img = self.Shoes9img.resize((200, 200), Image.LANCZOS)
+        self.Shoes9img = ImageTk.PhotoImage(self.Shoes9img)
+        self.Shoes9 = tk.Label(self.Canvas3, image=self.Shoes9img, bg="black")
+        self.Shoes9.image = self.Shoes9img
+        self.Shoes9.place(x=50, y=50)
+        self.Shoes9title = tk.Label(self.Canvas3, text="Shoes 9", font=("Helvetica", 15, "bold"), bg="black", fg="white")
+        self.Shoes9title.place(x=50, y=250)
+        self.Shoes9price = tk.Label(self.Canvas3, text="Price: $50", font=("Helvetica", 15, "bold"), bg="black", fg="white")
+        self.Shoes9price.place(x=50, y=280)
+        #dropdown menu for size
+        self.Shoes9size = ttk.Combobox(self.Canvas3, values=[7, 8, 9, 10, 11, 12], state="readonly")
+        self.Shoes9size.place(x=50, y=310)
+        self.Shoes9size.set("Select Size")
+        self.Shoes9button = Button(self.Canvas3, text="Add to Cart", bg="yellow", fg="black", highlightbackground="black", borderless=1)
+        self.Shoes9button.place(x=50, y=350)
+
+        self.Shoes10img = Image.open("/Users/bhardwaj/Documents/pictures for project/kidsshoes2.webp")
+        self.Shoes10img = self.Shoes10img.resize((200, 200), Image.LANCZOS)
+        self.Shoes10img = ImageTk.PhotoImage(self.Shoes10img)
+        self.Shoes10 = tk.Label(self.Canvas3, image=self.Shoes10img, bg="black")
+        self.Shoes10.image = self.Shoes10img
+        self.Shoes10.place(x=300, y=50)
+        self.Shoes10title = tk.Label(self.Canvas3, text="Shoes 10", font=("Helvetica", 15, "bold"), bg="black", fg="white")
+        self.Shoes10title.place(x=300, y=250)
+        self.Shoes10price = tk.Label(self.Canvas3, text="Price: $60", font=("Helvetica", 15, "bold"), bg="black", fg="white")
+        self.Shoes10price.place(x=300, y=280)
+        #dropdown menu for size
+        self.Shoes10size = ttk.Combobox(self.Canvas3, values=[7, 8, 9, 10, 11, 12], state="readonly")
+        self.Shoes10size.place(x=300, y=310)
+        self.Shoes10size.set("Select Size")
+        self.Shoes10button = Button(self.Canvas3, text="Add to Cart", bg="yellow", fg="black", highlightbackground="black", borderless=1)
+        self.Shoes10button.place(x=300, y=350)
+
+        self.Shoes11img = Image.open("/Users/bhardwaj/Documents/pictures for project/kids_shoes3.webp")
+        self.Shoes11img = self.Shoes11img.resize((200, 200), Image.LANCZOS)
+        self.Shoes11img = ImageTk.PhotoImage(self.Shoes11img)
+        self.Shoes11 = tk.Label(self.Canvas3, image=self.Shoes11img, bg="black")
+        self.Shoes11.image = self.Shoes11img
+        self.Shoes11.place(x=550, y=50)
+        self.Shoes11title = tk.Label(self.Canvas3, text="Shoes 11", font=("Helvetica", 15, "bold"), bg="black", fg="white")
+        self.Shoes11title.place(x=550, y=250)
+        self.Shoes11price = tk.Label(self.Canvas3, text="Price: $100", font=("Helvetica", 15, "bold"), bg="black", fg="white")
+        self.Shoes11price.place(x=550, y=280)
+        #dropdown menu for size
+        self.Shoes11size = ttk.Combobox(self.Canvas3, values=[7, 8, 9, 10, 11, 12], state="readonly")
+        self.Shoes11size.place(x=550, y=310)
+        self.Shoes11size.set("Select Size")
+        self.Shoes11button = Button(self.Canvas3, text="Add to Cart", bg="yellow", fg="black", highlightbackground="black", borderless=1)
+        self.Shoes11button.place(x=550, y=350)
+
+    #function for cart
+    def cart(self):
+        pass
 
 
 
