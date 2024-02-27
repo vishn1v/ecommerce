@@ -5,8 +5,15 @@ from mysql.connector import Error
 from PIL import Image, ImageTk
 from tkmacosx import Button
 from tkinter import ttk
+from tkinter import filedialog
 import os
 import re
+import smtplib
+from email.mime.multipart import MIMEMultipart
+from email.mime.text import MIMEText
+from email.mime.base import MIMEBase
+from email import encoders
+from fpdf import FPDF
 
 conn = sql.connect(
     host="localhost",
@@ -20,6 +27,7 @@ CREATE TABLE IF NOT EXISTS user_details (
     user_id INT AUTO_INCREMENT PRIMARY KEY,
     firstname VARCHAR(100) NOT NULL,
     lastname VARCHAR(100) NOT NULL,
+    role VARCHAR(100) default 'user' NOT NULL,
     phone VARCHAR(100) NOT NULL,
     address VARCHAR(100) NOT NULL,
     email VARCHAR(100) NOT NULL,
@@ -36,11 +44,11 @@ conn.close()
 
 
 
-class flipzon:
+class walkwise:
 
     def __init__(self,root):
         self.root = root
-        self.root.title("Welcome to flipzon")
+        self.root.title("Welcome to Walkwise")
         self.root.geometry("1040x900")
         self.root.configure(bg="white")
         self.root.attributes('-alpha', 1)
@@ -59,6 +67,8 @@ class flipzon:
 
         self.show_login()
 
+        self.cart_items = []
+
     def show_login(self):
         for i in self.root.winfo_children():
             i.destroy()
@@ -74,7 +84,7 @@ class flipzon:
         self.login_username_label= tk.Label(self.login_frame, text="Username",bg="white",fg="black",font=("Calibri","15","bold"),pady=5)
         self.login_username_entry= tk.Entry(self.login_frame)
         self.login_password_label= tk.Label(self.login_frame, text="Password",bg="white",fg="black",font=("Calibri","15","bold"))
-        self.login_password_entry= tk.Entry(self.login_frame)
+        self.login_password_entry= tk.Entry(self.login_frame,show="*")
         self.login_button = Button(self.login_frame, text="Login",bg="sky blue",fg="black",command=self.login,highlightbackground="grey",borderless=1)
         self.forgot_password_button = Button(self.login_frame, text="Forgot password?",bg="light green",fg="black",command=self.show_forgot_password_screen,highlightbackground="grey",borderless=1)
         self.createacc_button= Button(self.login_frame, text="New User? Create Your account",bg="light green",fg="black",command=self.show_create_account_screen,highlightbackground="grey",borderless=1)
@@ -158,7 +168,7 @@ class flipzon:
         self.flogin_username_label= tk.Label(self.forgot_password_frame, text="username",bg="black",fg="azure",font=("Calibri","15","bold"),pady="5")
         self.flogin_username_entry= tk.Entry(self.forgot_password_frame)
         self.flogin_password_label= tk.Label(self.forgot_password_frame, text="new password",bg="black",font=("Calibri","15","bold"),pady="5")
-        self.flogin_password_entry= tk.Entry(self.forgot_password_frame)
+        self.flogin_password_entry= tk.Entry(self.forgot_password_frame,show="*")
         self.flogin_confirm_password_label= tk.Label(self.forgot_password_frame, text="confirm password",bg="black",font=("Calibri","15","bold"),pady="5")
         self.flogin_confirm_password_entry= tk.Entry(self.forgot_password_frame)
         self.flogin_button = Button(self.forgot_password_frame, text="Update",bg="cyan",command=self.forgot_password,highlightbackground="grey",borderless=1)
@@ -192,8 +202,15 @@ class flipzon:
             cursor=con.cursor()
             #cursor.execute("CREATE TABLE IF NOT EXISTS users (username VARCHAR(255), password VARCHAR(255))")
 
+            #check if username already exists
+            cursor.execute("SELECT * FROM user_details WHERE username = %s", (c_username,))
+            user = cursor.fetchone()
+            if user:
+                mb.showinfo(title="Username exists", message="Username already exists, please try another")
+            else:
+
             # Insert data into the table
-            cursor.execute("INSERT INTO user_details (firstname, lastname, phone, address, email, username, password) VALUES (%s, %s, %s, %s, %s, %s,%s)", (c_firstname,c_lastname,c_phone,c_address,c_email,c_username, c_password))
+                cursor.execute("INSERT INTO user_details (firstname, lastname, phone, address, email, username, password) VALUES (%s, %s, %s, %s, %s, %s,%s)", (c_firstname,c_lastname,c_phone,c_address,c_email,c_username, c_password))
 
         
             con.commit()
@@ -215,14 +232,24 @@ class flipzon:
             con = sql.connect(host="localhost", user="root", password="0139612345", database="login_details")
             cursor=con.cursor()
             cursor.execute("SELECT * FROM user_details WHERE username = %s AND password = %s", (e_username, e_password))
-            data = cursor.fetchone()
+            self.user = cursor.fetchone()
 
-            if data:
+            if self.user:
+                # self.currentuser_username=e_username
+                # self.currentuser_role=self.user[3]
                 mb.showinfo(title="Login successful", message="Welcome, " + e_username)
-                self.catalog()
+                print(self.user[3])
+                if self.user[3]=='admin':
+                    self.adminpage()
+                    #self.catalog()
+                
+                else:
+                    self.catalog()
+            
             else:
                 mb.showinfo(title = "Login Usuccessful",message="Username or Password are incorrect. If you are new user create a new account" )
-    
+            con.commit()
+            con.close()
     #function to update password
     def forgot_password(self):
         con = sql.connect(host="localhost", user="root", password="0139612345", database="login_details")
@@ -254,55 +281,7 @@ class flipzon:
         else:
             mb.showerror("Error", "Invalid Email")
                     
-                     
-    #                 con = sql.connect(host="localhost", user="root", password="0139612345", database="login_details")
-    #                 #cursor=con.cursor()
-    #                 cursor.execute('''
-    #                     UPDATE users
-    #                     SET password = %s
-    #                     WHERE username = %s
-    #                 ''', (f_password, f_username))
-    #                 con.commit()
-    #                 con.close()
-    #                 mb.showinfo(title="Password updated",message="Password updated successfully")
-    #                 cursor = pdsdb.cursor()
-    #                 cursor.execute("UPDATE user_info SET password=%s WHERE email=%s", (new_password, email))
-    #                 pdsdb.commit()
-    #                 messagebox.showinfo("Success", "Password updated successfully")
-    #                 self.login_page()
-    #             except Error as e:
-    #                 messagebox.showerror("Error", e)
-    #         else:
-    #             messagebox.showerror("Error", "Password and Confirm Password do not match")
-    #     else:
-    #         messagebox.showerror("Error", "All fields are required")
-    # else:
-    #     messagebox.showerror("Error", "Invalid Email")
-
-    #     if f_username == "" or f_password == "":
-    #         mb.showinfo(title = "Fields are empty",message="provide a username and password for your account" )
-    #     else:
-    #         con = sql.connect(host="localhost", user="root", password="0139612345", database="login_details")
-    #         cursor=con.cursor()
-    #         cursor.execute('''
-    #             UPDATE users
-    #             SET password = %s
-    #             WHERE username = %s
-    #         ''', (f_password, f_username))
-    #         con.commit()
-    #         con.close()
-    #         mb.showinfo(title="Password updated",message="Password updated successfully")
-        # con = sql.connect(host="localhost", user="root", password="0139612345", database="login_details")
-        # cursor=con.cursor()
-        # cursor.execute('''
-        #     UPDATE users
-        #     SET password = %s
-        #     WHERE username = %s
-        # ''', (f_password, f_username))
-        # con.commit()
-        # con.close()
-        #return True  # Update successful
-        
+        con.close()
 
 
     def update_background_image(self,image_path):
@@ -316,8 +295,89 @@ class flipzon:
         if hasattr(self, 'background_label') and self.background_label.winfo_exists():
              self.background_label.destroy()
 
-    #function to create a caatalog of products using notebook
+    def adminpage(self):
+        for i in self.root.winfo_children():
+            i.destroy()
+            
+        self.background_label = tk.Label(root)
+        self.background_label.place(x=0, y=0, relwidth=1, relheight=1)
+        self.update_background_image("/Users/bhardwaj/Documents/pictures for project/_8411470f-cb7e-4dce-9e7c-6284cc604605.jpeg")
+        
+        self.admin_frame=tk.Frame(root,bg="black")
+        self.admin_label = tk.Label(self.admin_frame, text="Welcome to Admin Page",font=("Helvetica",20,"bold"),bg="black",fg="white")
+        self.admin_label.grid(row=0,column=0,columnspan=5,pady=10,sticky="w")
+        
+        self.admin_shoe_name_label= tk.Label(self.admin_frame, text="Shoe Name",bg="black",fg="azure",font=("Calibri","15","bold"))
+        self.admin_shoe_name_entry= tk.Entry(self.admin_frame)
+        self.admin_shoe_price_label= tk.Label(self.admin_frame, text="Shoe Price",bg="black",font=("Calibri","15","bold"))
+        self.admin_shoe_price_entry= tk.Entry(self.admin_frame)
+        #dropdown menu for shoe type
+        options = {'men','women','kids'}
+        self.admin_shoe_type_option = tk.StringVar(self.admin_frame)
+        self.admin_shoe_type_option.set('Select Shoe Type')
+        self.admin_shoe_type_option_menu = tk.OptionMenu(self.admin_frame, self.admin_shoe_type_option, *options)
+        self.admin_shoe_type_option_menu.config(width=15)
+        self.admin_shoe_type_label= tk.Label(self.admin_frame, text="Shoe Type",bg="black",font=("Calibri","15","bold"))
+        self.admin_shoe_type_option_menu.grid(row=3,column=1)
+
+        # self.admin_shoe_type_label= tk.Label(self.admin_frame, text="Shoe Type",bg="black",font=("Calibri","15","bold"))
+        # self.admin_shoe_type_entry= tk.Entry(self.admin_frame)
+        self.admin_shoe_image_label= tk.Label(self.admin_frame, text="Shoe Image",bg="black",font=("Calibri","15","bold"))
+        self.admin_shoe_image_button= Button(self.admin_frame, text="Upload Image",bg="yellow",command=self.upload_image,highlightbackground="black",borderless=1)
+        self.admin_add_to_catalog_button = Button(self.admin_frame, text="Add to Catalog",bg="yellow",command=self.add_to_catalog,highlightbackground="black",borderless=1)
+        self.admin_catalog_button = Button(self.admin_frame, text="Catalog",bg="yellow",command=self.catalog,highlightbackground="black",borderless=1)
+
+        self.admin_shoe_name_label.grid(row=1,column=0)
+        self.admin_shoe_name_entry.grid(row=1, column=1)
+        self.admin_shoe_price_label.grid(row=2,column=0)
+        self.admin_shoe_price_entry.grid(row=2,column=1)
+        self.admin_shoe_type_label.grid(row=3,column=0)
+        # self.admin_shoe_type_entry.grid(row=3,column=1)
+        self.admin_shoe_image_label.grid(row=4,column=0)
+        self.admin_shoe_image_button.grid(row=4,column=1)
+        self.admin_add_to_catalog_button.grid(row=5,column=0,columnspan=2,pady="10")
+        self.admin_catalog_button.grid(row=6,column=0,columnspan=2,pady="10")
+
+
+        self.admin_frame.place(x=327,y=230)
+        #self.admin_frame.pack()
+
+    #upload image
+    def upload_image(self):
+        self.filename = filedialog.askopenfilename(initialdir="/", title="Select A File", filetypes=(("JPEG files", "*.jpeg"),("JPG files", "*.jpg"), ("PNG files", "*.png"),("all files", "*.*")))
+        print(self.filename)
+
+        #messagebox.showinfo("Success", "Image Uploaded")
+        if self.filename:
+
+            mb.showinfo("Success", "Image Uploaded")
+            self.admin_shoe_image_button.config(text="Image Uploaded")
+        else:
+            mb.showinfo("Error", "No Image Selected")
+
+
+        #update insert movie page image button admin_shoe_image_button
+        #self.admin_shoe_image_button.config(text="Image Uploaded")
+
+    #function to add to catalog
+    def add_to_catalog(self):
+        shoe_name=self.admin_shoe_name_entry.get()
+        shoe_price=self.admin_shoe_price_entry.get()
+        shoe_type=self.admin_shoe_type_option.get()
+        shoe_image=self.filename
+        print(shoe_name, shoe_price,shoe_type, shoe_image)
+
+        con = sql.connect(host="localhost", user="root", password="0139612345", database="login_details")
+        cursor=con.cursor()
+        cursor.execute("CREATE TABLE IF NOT EXISTS catalog (shoe_id INT AUTO_INCREMENT PRIMARY KEY, shoe_name VARCHAR(100) NOT NULL, shoe_price VARCHAR(100) NOT NULL,shoe_type VARCHAR(100) NOT NULL, shoe_image VARCHAR(100) NOT NULL)")
+        cursor.execute("INSERT INTO catalog (shoe_name, shoe_price, shoe_type, shoe_image) VALUES (%s, %s, %s, %s)", (shoe_name, shoe_price, shoe_type, shoe_image))
+        con.commit()
+        con.close()
+        mb.showinfo("Success", "Shoe added to catalog")
+
+    #function to display a catalog of products using notebook
     def catalog(self):
+        
         for i in self.root.winfo_children():
             i.destroy()
 
@@ -331,271 +391,450 @@ class flipzon:
         self.notebook.add(self.frame2, text="Women Shoes")
         self.notebook.add(self.frame3, text="Kids Shoes")
         self.notebook.pack(expand=True, fill="both")
+        
+        #connect to the database
+        con = sql.connect(host="localhost", user="root", password="0139612345", database="login_details")
 
-        #frame1
-        # self.img1 = Image.open("/Users/bhardwaj/Documents/pictures for project/mike-petrucci-c9FQyqIECds-unsplash.jpg")
-        # self.resized_image1 = self.img1.resize((1035, 850), Image.LANCZOS)
-        # self.image_tk1 = ImageTk.PhotoImage(self.resized_image1)
-        # self.background_label1 = tk.Label(self.frame1, image=self.image_tk1)
-        # self.background_label1.image = self.image_tk1
-        # self.background_label1.place(x=0, y=0, relwidth=1, relheight=1)
-        # self.title1 = tk.Label(self.frame1, text="MEN SHOES", font=("Helvetica", 20, "bold"), bg="black", fg="white")
-        # self.title1.place(x=450, y=10)
+        cursor=con.cursor()
+        cursor.execute("SELECT * FROM catalog")
+        shoes = cursor.fetchall()
+        con.close()
 
-        self.Canvas= tk.Canvas(self.frame1, bg="black", height=850, width=1035)
-        self.Canvas.place(x=0, y=0, relwidth=1, relheight=1)
-        self.Shoes1img = Image.open("/Users/bhardwaj/Documents/pictures for project/men_shoes1.jpeg")
-        self.Shoes1img = self.Shoes1img.resize((200, 200), Image.LANCZOS)
-        self.Shoes1img = ImageTk.PhotoImage(self.Shoes1img)
-        self.Shoes1 = tk.Label(self.Canvas, image=self.Shoes1img, bg="black")
-        self.Shoes1.image = self.Shoes1img
-        self.Shoes1.place(x=50, y=50)
-        self.Shoes1title = tk.Label(self.Canvas, text="Shoes 1", font=("Helvetica", 15, "bold"), bg="black", fg="white")
-        self.Shoes1title.place(x=50, y=250)
-        self.Shoes1price = tk.Label(self.Canvas, text="Price: $50", font=("Helvetica", 15, "bold"), bg="black", fg="white")
-        self.Shoes1price.place(x=50, y=280)
-        #dropdown menu for size
-        self.Shoes1size = ttk.Combobox(self.Canvas, values=[7, 8, 9, 10, 11, 12], state="readonly")
-        self.Shoes1size.place(x=50, y=310)
-        self.Shoes1size.set("Select Size")
-
-        self.Shoes1button = Button(self.Canvas, text="Add to Cart", bg="yellow", fg="black", highlightbackground="black", borderless=1)
-        self.Shoes1button.place(x=50, y=350)
-
-        self.Shoes2img = Image.open("/Users/bhardwaj/Documents/pictures for project/men_shoes3.jpeg")
-        self.Shoes2img = self.Shoes2img.resize((200, 200), Image.LANCZOS)
-        self.Shoes2img = ImageTk.PhotoImage(self.Shoes2img)
-        self.Shoes2 = tk.Label(self.Canvas, image=self.Shoes2img, bg="black")
-        self.Shoes2.image = self.Shoes2img
-        self.Shoes2.place(x=300, y=50)
-        self.Shoes2title = tk.Label(self.Canvas, text="Shoes 2", font=("Helvetica", 15, "bold"), bg="black", fg="white")
-        self.Shoes2title.place(x=300, y=250)
-        self.Shoes2price = tk.Label(self.Canvas, text="Price: $60", font=("Helvetica", 15, "bold"), bg="black", fg="white")
-        self.Shoes2price.place(x=300, y=280)
-        #dropdown menu for size
-        self.Shoes2size = ttk.Combobox(self.Canvas, values=[7, 8, 9, 10, 11, 12], state="readonly")
-        self.Shoes2size.place(x=300, y=310)
-        self.Shoes2size.set("Select Size")
-        self.Shoes2button = Button(self.Canvas, text="Add to Cart", bg="yellow", fg="black", highlightbackground="black", borderless=1)
-        self.Shoes2button.place(x=300, y=350)
-
-        self.Shoes3img = Image.open("/Users/bhardwaj/Documents/pictures for project/jordans.jpeg")
-        self.Shoes3img = self.Shoes3img.resize((200, 200), Image.LANCZOS)
-        self.Shoes3img = ImageTk.PhotoImage(self.Shoes3img)
-        self.Shoes3 = tk.Label(self.Canvas, image=self.Shoes3img, bg="black")
-        self.Shoes3.image = self.Shoes3img
-        self.Shoes3.place(x=550, y=50)
-        self.Shoes3title = tk.Label(self.Canvas, text="Shoes 3", font=("Helvetica", 15, "bold"), bg="black", fg="white")
-        self.Shoes3title.place(x=550, y=250)
-        self.Shoes3price = tk.Label(self.Canvas, text="Price: $100", font=("Helvetica", 15, "bold"), bg="black", fg="white")
-        self.Shoes3price.place(x=550, y=280)
-        #dropdown menu for size
-        self.Shoes3size = ttk.Combobox(self.Canvas, values=[7, 8, 9, 10, 11, 12], state="readonly")
-        self.Shoes3size.place(x=550, y=310)
-        self.Shoes3size.set("Select Size")
-        self.Shoes3button = Button(self.Canvas, text="Add to Cart", bg="yellow", fg="black", highlightbackground="black", borderless=1)
-        self.Shoes3button.place(x=550, y=350)
-
-        self.Shoes4img = Image.open("/Users/bhardwaj/Documents/pictures for project/footballshoes.jpeg")
-        self.Shoes4img = self.Shoes4img.resize((200, 200), Image.LANCZOS)
-        self.Shoes4img = ImageTk.PhotoImage(self.Shoes4img)
-        self.Shoes4 = tk.Label(self.Canvas, image=self.Shoes4img, bg="black")
-        self.Shoes4.image = self.Shoes4img
-        self.Shoes4.place(x=800, y=50)
-        self.Shoes4title = tk.Label(self.Canvas, text="Shoes 4", font=("Helvetica", 15, "bold"), bg="black", fg="white")
-        self.Shoes4title.place(x=800, y=250)
-        self.Shoes4price = tk.Label(self.Canvas, text="Price: $80", font=("Helvetica", 15, "bold"), bg="black", fg="white")
-        self.Shoes4price.place(x=800, y=280)
-        #dropdown menu for size
-        self.Shoes4size = ttk.Combobox(self.Canvas, values=[7, 8, 9, 10, 11, 12], state="readonly")
-        self.Shoes4size.place(x=800, y=310)
-        self.Shoes4size.set("Select Size")
-        self.Shoes4button = Button(self.Canvas, text="Add to Cart", bg="yellow", fg="black", highlightbackground="black", borderless=1)
-        self.Shoes4button.place(x=800, y=350)
+        #print shoes based on type
+        # for i, shoe in enumerate(shoes):
+        #     shoe=list(shoe)
+        #     shoe = {
+        #             "shoe_id": shoe[0],
+        #             "shoe_name": shoe[1],
+        #             "shoe_price": shoe[2],
+        #             "shoe_type": shoe[3],
+        #             "shoe_image": shoe[4]
+        #         }
+        #     print(shoe)
 
         
 
-        #frame2
-        # self.img2 = Image.open("/Users/bhardwaj/Documents/pictures for project/women_shoes.png")
-        # self.resized_image2 = self.img2.resize((1035, 850), Image.LANCZOS)
-        # self.image_tk2 = ImageTk.PhotoImage(self.resized_image2)
-        # self.background_label2 = tk.Label(self.frame2, image=self.image_tk2)
-        # self.background_label2.image = self.image_tk2
-        # self.background_label2.place(x=0, y=0, relwidth=1, relheight=1)
-        # self.title2 = tk.Label(self.frame2, text="WOMEN SHOES", font=("Helvetica", 20, "bold"), bg="black", fg="white")
-        # self.title2.place(x=450, y=10)
+        #print all the shoes in the catalog
+        #iterate one by one from all shoes and display images
+        for i, shoe in enumerate(shoes):
+            #display shoe image as button
+            shoe=list(shoe)
+            shoe = {
+                    "shoe_id": shoe[0],
+                    "shoe_name": shoe[1],
+                    "shoe_price": shoe[2],
+                    "shoe_type": shoe[3],
+                    "shoe_image": shoe[4]
+                }
+            if shoe["shoe_type"] == "men":
 
-        self.Canvas2= tk.Canvas(self.frame2, bg="black", height=850, width=1035)
-        self.Canvas2.place(x=0, y=0, relwidth=1, relheight=1)
-        self.Shoes5img = Image.open("/Users/bhardwaj/Documents/pictures for project/women_shoes1.webp")
-        self.Shoes5img = self.Shoes5img.resize((200, 200), Image.LANCZOS)
-        self.Shoes5img = ImageTk.PhotoImage(self.Shoes5img)
-        self.Shoes5 = tk.Label(self.Canvas2, image=self.Shoes5img, bg="black")
-        self.Shoes5.image = self.Shoes5img
-        self.Shoes5.place(x=50, y=50)
-        self.Shoes5title = tk.Label(self.Canvas2, text="Shoes 5", font=("Helvetica", 15, "bold"), bg="black", fg="white")
-        self.Shoes5title.place(x=50, y=250)
-        self.Shoes5price = tk.Label(self.Canvas2, text="Price: $50", font=("Helvetica", 15, "bold"), bg="black", fg="white")
-        self.Shoes5price.place(x=50, y=280)
-        #dropdown menu for size
-        self.Shoes5size = ttk.Combobox(self.Canvas2, values=[7, 8, 9, 10, 11, 12], state="readonly")
-        self.Shoes5size.place(x=50, y=310)
-        self.Shoes5size.set("Select Size")
-        self.Shoes5button = Button(self.Canvas2, text="Add to Cart", bg="yellow", fg="black", highlightbackground="black", borderless=1)
-        self.Shoes5button.place(x=50, y=350)
+                image = Image.open(shoe["shoe_image"])
+                image = image.resize((150, 200), Image.LANCZOS)
+                photo = ImageTk.PhotoImage(image)
+                row = i // 6  # integer division to get row number
+                col = i % 6 # modulo operator to get column number
 
-        self.Shoes6img = Image.open("/Users/bhardwaj/Documents/pictures for project/women_shoes3.jpeg")
-        self.Shoes6img = self.Shoes6img.resize((200, 200), Image.LANCZOS)
-        self.Shoes6img = ImageTk.PhotoImage(self.Shoes6img)
-        self.Shoes6 = tk.Label(self.Canvas2, image=self.Shoes6img, bg="black")
-        self.Shoes6.image = self.Shoes6img
-        self.Shoes6.place(x=300, y=50)
-        self.Shoes6title = tk.Label(self.Canvas2, text="Shoes 6", font=("Helvetica", 15, "bold"), bg="black", fg="white")
-        self.Shoes6title.place(x=300, y=250)
-        self.Shoes6price = tk.Label(self.Canvas2, text="Price: $60", font=("Helvetica", 15, "bold"), bg="black", fg="white")
-        self.Shoes6price.place(x=300, y=280)
-        #dropdown menu for size
-        self.Shoes6size = ttk.Combobox(self.Canvas2, values=[7, 8, 9, 10, 11, 12], state="readonly")
-        self.Shoes6size.place(x=300, y=310)
-        self.Shoes6size.set("Select Size")
-        self.Shoes6button = Button(self.Canvas2, text="Add to Cart", bg="yellow", fg="black", highlightbackground="black", borderless=1)
-        self.Shoes6button.place(x=300, y=350)
+                catalog_shoe_button = tk.Button(self.frame1, image=photo, command=lambda shoe=shoe: self.show_shoe_details(shoe))
+                catalog_shoe_button.image = photo
+                catalog_shoe_button.grid(row=row, column=col, padx=5, pady=5)
 
-        self.Shoes7img = Image.open("/Users/bhardwaj/Documents/pictures for project/women_shoes2.webp")
-        self.Shoes7img = self.Shoes7img.resize((200, 200), Image.LANCZOS)
-        self.Shoes7img = ImageTk.PhotoImage(self.Shoes7img)
-        self.Shoes7 = tk.Label(self.Canvas2, image=self.Shoes7img, bg="black")
-        self.Shoes7.image = self.Shoes7img
-        self.Shoes7.place(x=550, y=50)
-        self.Shoes7title = tk.Label(self.Canvas2, text="Shoes 7", font=("Helvetica", 15, "bold"), bg="black", fg="white")
-        self.Shoes7title.place(x=550, y=250)
-        self.Shoes7price = tk.Label(self.Canvas2, text="Price: $100", font=("Helvetica", 15, "bold"), bg="black", fg="white")
-        self.Shoes7price.place(x=550, y=280)
-        #dropdown menu for size
-        self.Shoes7size = ttk.Combobox(self.Canvas2, values=[7, 8, 9, 10, 11, 12], state="readonly")
-        self.Shoes7size.place(x=550, y=310)
-        self.Shoes7size.set("Select Size")
-        self.Shoes7button = Button(self.Canvas2, text="Add to Cart", bg="yellow", fg="black", highlightbackground="black", borderless=1)
-        self.Shoes7button.place(x=550, y=350)
+            elif shoe["shoe_type"] == "women":
+                image = Image.open(shoe["shoe_image"])
+                image = image.resize((150, 200), Image.LANCZOS)
+                photo = ImageTk.PhotoImage(image)
+                row = i // 6  # integer division to get row number
+                col = i % 6 # modulo operator to get column number
 
-        self.Shoes8img = Image.open("/Users/bhardwaj/Documents/pictures for project/womenshoes5.webp")
-        self.Shoes8img = self.Shoes8img.resize((200, 200), Image.LANCZOS)
-        self.Shoes8img = ImageTk.PhotoImage(self.Shoes8img)
-        self.Shoes8 = tk.Label(self.Canvas2, image=self.Shoes8img, bg="black")
-        self.Shoes8.image = self.Shoes8img
-        self.Shoes8.place(x=800, y=50)
-        self.Shoes8title = tk.Label(self.Canvas2, text="Shoes 8", font=("Helvetica", 15, "bold"), bg="black", fg="white")
-        self.Shoes8title.place(x=800, y=250)
-        self.Shoes8price = tk.Label(self.Canvas2, text="Price: $80", font=("Helvetica", 15, "bold"), bg="black", fg="white")
-        self.Shoes8price.place(x=800, y=280)
-        #dropdown menu for size
-        self.Shoes8size = ttk.Combobox(self.Canvas2, values=[7, 8, 9, 10, 11, 12], state="readonly")
-        self.Shoes8size.place(x=800, y=310)
-        self.Shoes8size.set("Select Size")
-        self.Shoes8button = Button(self.Canvas2, text="Add to Cart", bg="yellow", fg="black", highlightbackground="black", borderless=1)
-        self.Shoes8button.place(x=800, y=350)
+                catalog_shoe_button = tk.Button(self.frame2, image=photo, command=lambda shoe=shoe: self.show_shoe_details(shoe))
+                catalog_shoe_button.image = photo
+                catalog_shoe_button.grid(row=row, column=col, padx=5, pady=5)
+
+            elif shoe["shoe_type"] == "kids":
+                image = Image.open(shoe["shoe_image"])
+                image = image.resize((150, 200), Image.LANCZOS)
+                photo = ImageTk.PhotoImage(image)
+                row = i // 6
+                col = i % 6
+
+                catalog_shoe_button = tk.Button(self.frame3, image=photo, command=lambda shoe=shoe: self.show_shoe_details(shoe))
+                catalog_shoe_button.image = photo
+                catalog_shoe_button.grid(row=row, column=col, padx=5, pady=5)
+    
+    #view cart icon
+        cart_image = Image.open("/Users/bhardwaj/Documents/pictures for project/cart.png")
+        cart_image = cart_image.resize((50, 50), Image.LANCZOS)
+        cart_photo = ImageTk.PhotoImage(cart_image)
+        cart_button = tk.Button(self.root, image=cart_photo, command=self.cart)
+        cart_button.image = cart_photo
+        cart_button.place(x=950, y=10)
 
 
+    def show_shoe_details(self, shoe):
+        
+        
+        shoe_details_frame = tk.Frame(self.root, bg="#f3e7c4")
+        shoe_details_frame.place(x=0, y=0, relwidth=1, relheight=1)
+        # Load the background image
+        bg_image = Image.open("/Users/bhardwaj/Documents/pictures for project/JPEG image-4FFE-866D-43-0.jpeg")
+        bg_image = bg_image.resize((1035, 850), Image.LANCZOS)  # Adjust the size as needed
+        bg_photo = ImageTk.PhotoImage(bg_image)
+
+        # Create a label with the background image
+        bg_label = tk.Label(shoe_details_frame, image=bg_photo)
+        bg_label.image = bg_photo
+        bg_label.place(x=0, y=0, relwidth=1, relheight=1)
+
+        # #display shoe deatils to the right of the image
+        # shoe_name_label = tk.Label(shoe_details_frame, text=shoe["shoe_name"], font=("Helvetica", 20, "bold"), bg="black", fg="white")
+        # shoe_name_label.place(x=10, y=10)
+        # shoe_price_label = tk.Label(shoe_details_frame, text=shoe["shoe_price"], font=("Helvetica", 20, "bold"), bg="black", fg="white")
+        # shoe_price_label.place(x=10, y=50)
+        # shoe_type_label = tk.Label(shoe_details_frame, text=shoe["shoe_type"], font=("Helvetica", 20, "bold"), bg="black", fg="white")
+        # shoe_type_label.place(x=10, y=90)
+        #display the shoe image to the left of the details
+        image = Image.open(shoe["shoe_image"])
+        image = image.resize((350, 400), Image.LANCZOS)
+        photo = ImageTk.PhotoImage(image)
+        shoe_image_label = tk.Label(shoe_details_frame, image=photo)
+        shoe_image_label.image = photo
+        shoe_image_label.place(x=10, y=130)
+        #shoe_image_label.pack(side=tk.LEFT, padx=20, pady=20)
+        # add_to_cart_button = tk.Button(shoe_details_frame, text="Add to Cart", command=lambda: self.cart(shoe["shoe_name"], shoe["shoe_price"], shoe["shoe_type"], shoe["shoe_image"]))
+        # add_to_cart_button.pack(pady=10)
+        # back_button = tk.Button(shoe_details_frame, text="Back", command=shoe_details_frame.destroy)
+        # back_button.pack(pady=10)
+        shoe_name_label = tk.Label(shoe_details_frame, text=shoe["shoe_name"], font=("Calibri", 52, "bold","italic"), bg="#f3e7c4",fg="black")
+        shoe_name_label.place(x=550, y=170)
+
+        shoe_price_label = tk.Label(shoe_details_frame, text=shoe["shoe_price"], font=("Calibri", 30, "bold"), bg="#f3e7c4", fg="black")
+        shoe_price_label.place(x=550, y=270)
+
+        shoe_type_label = tk.Label(shoe_details_frame, text=shoe["shoe_type"], font=("Calibri", 20, "bold"), bg="#f3e7c4", fg="black")
+        shoe_type_label.place(x=550, y=330)
+
+        #dropdown for shoe size
+        #arrange the options for the dropdown
+        options = ['6','7','8','9','10','11','12']
+        #Sort the options list as strings converted to integers
+        options.sort(key=int)
+        
+        self.shoe_size_option = tk.StringVar(shoe_details_frame)
+        self.shoe_size_option.set('Select Shoe Size')
+        # self.shoe_size_combo = ttk.Combobox(shoe_details_frame, textvariable=self.shoe_size_option, values=options) 
+        # self.shoe_size_combo.config(width=15)
+        # self.shoe_size_combo.place(x=550, y=390)
+
+        self.shoe_size_option_menu = tk.OptionMenu(shoe_details_frame, self.shoe_size_option, *options)
+        self.shoe_size_option_menu.config(width=15)
+        self.shoe_size_label= tk.Label(shoe_details_frame, text="Shoe Size", font=("Calibri","15","bold"), bg="gray", fg="white",highlightbackground="#f3e7c4")
+        self.shoe_size_option_menu.place(x=550, y=390)
+
+        
+        
 
 
-        #frame3
-        # self.img3 = Image.open("/Users/bhardwaj/Documents/pictures for project/kids_shoes.png")
-        # self.resized_image3 = self.img3.resize((1035, 850), Image.LANCZOS)
-        # self.image_tk3 = ImageTk.PhotoImage(self.resized_image3)
-        # self.background_label3 = tk.Label(self.frame3, image=self.image_tk3)
-        # self.background_label3.image = self.image_tk3
-        # self.background_label3.place(x=0, y=0, relwidth=1, relheight=1)
-        # self.title3 = tk.Label(self.frame3, text="KIDS SHOES", font=("Helvetica", 20, "bold"), bg="black", fg="white")
-        # self.title3.place(x=450, y=10)
+        add_to_cart_button = Button(shoe_details_frame, text="Add to Cart",bg="gray",borderless=1, command=lambda: self.handle_add_to_cart(shoe["shoe_name"], shoe["shoe_price"], shoe["shoe_type"], shoe["shoe_image"]),highlightbackground="#f3e7c4")
+        add_to_cart_button.place(x=580, y=420)
 
-        self.Canvas3= tk.Canvas(self.frame3, bg="black", height=850, width=1035)
-        self.Canvas3.place(x=0, y=0, relwidth=1, relheight=1)
-        self.Shoes9img = Image.open("/Users/bhardwaj/Documents/pictures for project/kids_shoes.jpg")
-        self.Shoes9img = self.Shoes9img.resize((200, 200), Image.LANCZOS)
-        self.Shoes9img = ImageTk.PhotoImage(self.Shoes9img)
-        self.Shoes9 = tk.Label(self.Canvas3, image=self.Shoes9img, bg="black")
-        self.Shoes9.image = self.Shoes9img
-        self.Shoes9.place(x=50, y=50)
-        self.Shoes9title = tk.Label(self.Canvas3, text="Shoes 9", font=("Helvetica", 15, "bold"), bg="black", fg="white")
-        self.Shoes9title.place(x=50, y=250)
-        self.Shoes9price = tk.Label(self.Canvas3, text="Price: $50", font=("Helvetica", 15, "bold"), bg="black", fg="white")
-        self.Shoes9price.place(x=50, y=280)
-        #dropdown menu for size
-        self.Shoes9size = ttk.Combobox(self.Canvas3, values=[7, 8, 9, 10, 11, 12], state="readonly")
-        self.Shoes9size.place(x=50, y=310)
-        self.Shoes9size.set("Select Size")
-        self.Shoes9button = Button(self.Canvas3, text="Add to Cart", bg="yellow", fg="black", highlightbackground="black", borderless=1)
-        self.Shoes9button.place(x=50, y=350)
+        back_button = Button(shoe_details_frame, text="Back",bg="gray", command=shoe_details_frame.destroy,highlightbackground="#f3e7c4",borderless=1)
+        back_button.place(x=580, y=470)
 
-        self.Shoes10img = Image.open("/Users/bhardwaj/Documents/pictures for project/kidsshoes2.webp")
-        self.Shoes10img = self.Shoes10img.resize((200, 200), Image.LANCZOS)
-        self.Shoes10img = ImageTk.PhotoImage(self.Shoes10img)
-        self.Shoes10 = tk.Label(self.Canvas3, image=self.Shoes10img, bg="black")
-        self.Shoes10.image = self.Shoes10img
-        self.Shoes10.place(x=300, y=50)
-        self.Shoes10title = tk.Label(self.Canvas3, text="Shoes 10", font=("Helvetica", 15, "bold"), bg="black", fg="white")
-        self.Shoes10title.place(x=300, y=250)
-        self.Shoes10price = tk.Label(self.Canvas3, text="Price: $60", font=("Helvetica", 15, "bold"), bg="black", fg="white")
-        self.Shoes10price.place(x=300, y=280)
-        #dropdown menu for size
-        self.Shoes10size = ttk.Combobox(self.Canvas3, values=[7, 8, 9, 10, 11, 12], state="readonly")
-        self.Shoes10size.place(x=300, y=310)
-        self.Shoes10size.set("Select Size")
-        self.Shoes10button = Button(self.Canvas3, text="Add to Cart", bg="yellow", fg="black", highlightbackground="black", borderless=1)
-        self.Shoes10button.place(x=300, y=350)
+        #continue shopping button
+        # continue_shopping_button = Button(shoe_details_frame, text="Continue Shopping",bg="gray", command=self.catalog,highlightbackground="#f3e7c4",borderless=1)
+        # continue_shopping_button.place(x=580, y=520)
 
-        self.Shoes11img = Image.open("/Users/bhardwaj/Documents/pictures for project/kids_shoes3.webp")
-        self.Shoes11img = self.Shoes11img.resize((200, 200), Image.LANCZOS)
-        self.Shoes11img = ImageTk.PhotoImage(self.Shoes11img)
-        self.Shoes11 = tk.Label(self.Canvas3, image=self.Shoes11img, bg="black")
-        self.Shoes11.image = self.Shoes11img
-        self.Shoes11.place(x=550, y=50)
-        self.Shoes11title = tk.Label(self.Canvas3, text="Shoes 11", font=("Helvetica", 15, "bold"), bg="black", fg="white")
-        self.Shoes11title.place(x=550, y=250)
-        self.Shoes11price = tk.Label(self.Canvas3, text="Price: $100", font=("Helvetica", 15, "bold"), bg="black", fg="white")
-        self.Shoes11price.place(x=550, y=280)
-        #dropdown menu for size
-        self.Shoes11size = ttk.Combobox(self.Canvas3, values=[7, 8, 9, 10, 11, 12], state="readonly")
-        self.Shoes11size.place(x=550, y=310)
-        self.Shoes11size.set("Select Size")
-        self.Shoes11button = Button(self.Canvas3, text="Add to Cart", bg="yellow", fg="black", highlightbackground="black", borderless=1)
-        self.Shoes11button.place(x=550, y=350)
+        #view cart button
+        view_cart_button = Button(shoe_details_frame, text="View Cart",bg="gray", command=self.cart,highlightbackground="#f3e7c4",borderless=1)
+        view_cart_button.place(x=580, y=570)
+        # view_cart_button = Button(shoe_details_frame, text="View Cart",bg="gray", command=self.cart ,highlightbackground="#f3e7c4",borderless=1)
+        # view_cart_button.place(x=580, y=570)
 
-    #function for cart
-    def cart(self):
-        pass
+        
+        #self.update_background_image("/Users/bhardwaj/Documents/pictures for project/bg2.jpeg")
+
+
+
+        #delete button if user is admin
+        if self.user[3] == "admin":
+            delete_button = tk.Button(shoe_details_frame, text="Delete", command=lambda: self.delete_product(shoe["shoe_name"]))
+            delete_button.pack(pady=10)
+
+    def handle_add_to_cart(self, shoe_name=None, shoe_price=None, shoe_type=None, shoe_image=None, shoe_size=None):
+
+        shoe_size = self.shoe_size_option.get()
+        if shoe_size == 'Select Shoe Size':
+            mb.showerror("Error", "Please select a shoe size.")
+        else:
+            if shoe_name and shoe_price and shoe_type and shoe_image and shoe_size:
+                item = {"name": shoe_name, "price": shoe_price, "type": shoe_type, "image_path": shoe_image, "size": shoe_size}
+                self.cart_items.append(item)
+
+
+            mb.showinfo("Success", "Added to cart")
+
+
+    def cart(self, shoe_name=None, shoe_price=None, shoe_type=None, shoe_image=None):
+        # shoe_size = self.shoe_size_option.get()
+        # if shoe_size == 'Select Shoe Size':
+        #     mb.showerror("Error", "Please select a shoe size.")
+        # else:
+            
+        #     mb.showinfo("Success", "Added to cart")
+
+        
+    # Add selected item to the cart_items list
+        # if shoe_name and shoe_price and shoe_type and shoe_image:
+        #     item = {"name": shoe_name, "price": shoe_price, "type": shoe_type, "image_path": shoe_image}
+        #     self.cart_items.append(item)
+
+    # Create a new frame for the cart
+        self.cart_frame = tk.Frame(self.root, bg="white")
+        self.cart_frame.place(x=0, y=0, relwidth=1, relheight=1)
+    
+    #if cart is empty, display a message
+        if not self.cart_items:
+            label = tk.Label(self.cart_frame, text="Cart is empty", font=("Helvetica", 20, "bold"), bg="white", fg="black")
+            label.pack(pady=10)
+    
+
+    # Display cart items in the cart frame
+        for idx, item in enumerate(self.cart_items):
+            if item:
+                self.item_frame = tk.Frame(self.cart_frame, bg="white", bd=1, relief=tk.SOLID)
+                self.item_frame.pack(fill=tk.BOTH, padx=10, pady=5)
+
+                # Shoe image
+                image = Image.open(item["image_path"])
+                image = image.resize((100, 150), Image.LANCZOS)
+                photo = ImageTk.PhotoImage(image)
+                shoe_image_label = tk.Label(self.item_frame, image=photo, bg="white")
+                shoe_image_label.image = photo
+                shoe_image_label.pack(side=tk.LEFT, padx=10, pady=10)
+
+                # Shoe details
+                self.details_frame = tk.Frame(self.item_frame, bg="white")
+                self.details_frame.pack(side=tk.LEFT, padx=10, pady=10)
+
+                shoe_name_label = tk.Label(self.details_frame, text=item["name"], font=("Helvetica", 16, "bold"), bg="white", fg="black")
+                shoe_name_label.pack(anchor=tk.W)
+
+                price_label = tk.Label(self.details_frame, text=f"Price: {item['price']}", font=("Helvetica", 14), bg="white", fg="black")
+                price_label.pack(anchor=tk.W)
+
+                type_label = tk.Label(self.details_frame, text=f"type: {item['type']}", font=("Helvetica", 14), bg="white", fg="black")
+                type_label.pack(anchor=tk.W)
+
+                #size details
+                size_label = tk.Label(self.details_frame, text=f"Size: {self.shoe_size_option.get()}", font=("Helvetica", 14), bg="white", fg="black")
+                size_label.pack(anchor=tk.W)
+
+                # Remove from cart button
+                remove_from_cart_button = tk.Button(self.item_frame, text="Remove from Cart", command=lambda shoe=item["name"]: self.remove_from_cart(shoe))
+                remove_from_cart_button.pack(side=tk.RIGHT, padx=10, pady=10)
+
+
+    # Continue shopping button
+        continue_shopping_button = tk.Button(self.cart_frame, text="Continue Shopping", command=self.catalog)
+        continue_shopping_button.pack(pady=10)
+
+    # Order button
+        order_button = tk.Button(self.cart_frame, text="Place Order", command=self.place_order)
+        order_button.pack(pady=10)
+
+    def remove_from_cart(self, shoe_name):
+        #print self.cart_items
+        print(self.cart_items, shoe_name)
+        # Remove the item from the cart_items list
+        for item in self.cart_items:
+            if item["name"] == shoe_name:
+                self.cart_items.remove(item)
+                break
+
+        # If the cart is empty, display a message
+        if not self.cart_items:
+            self.cart_frame.destroy()
+            mb.showinfo("Success", "Cart is empty")
+        
+
+        else:
+            self.cart_frame.destroy()
+        
+            self.cart()
+
+        # # Destroy the item frame
+        # self.item_frame.destroy()
+        
+        #after removing the item, display the updated cart
+       
+
+
+        
+        
+
+
+
+
+
+                          
+
+     
+    #order page function
+    def place_order(self):
+        #print the cart items in a new window
+        order_frame = tk.Frame(self.root, bg="white")
+        order_frame.place(x=0, y=0, relwidth=1, relheight=1)
+        #display the cart items in the order frame
+        for idx, item in enumerate(self.cart_items):
+            if item:
+                self.item_frame = tk.Frame(order_frame, bg="white", bd=1, relief=tk.SOLID)
+                self.item_frame.pack(fill=tk.BOTH, padx=10, pady=5)
+
+                # Shoe image
+                image = Image.open(item["image_path"])
+                image = image.resize((100, 150), Image.LANCZOS)
+                photo = ImageTk.PhotoImage(image)
+                shoe_image_label = tk.Label(self.item_frame, image=photo, bg="white")
+                shoe_image_label.image = photo
+                shoe_image_label.pack(side=tk.LEFT, padx=10, pady=10)
+
+                # Shoe details
+                self.details_frame = tk.Frame(self.item_frame, bg="white")
+                self.details_frame.pack(side=tk.LEFT, padx=10, pady=10)
+
+                shoe_name_label = tk.Label(self.details_frame, text=item["name"], font=("Helvetica", 16, "bold"), bg="white", fg="black")
+                shoe_name_label.pack(anchor=tk.W)
+
+                price_label = tk.Label(self.details_frame, text=f"Price: {item['price']}", font=("Helvetica", 14), bg="white", fg="black")
+                price_label.pack(anchor=tk.W)
+
+                type_label = tk.Label(self.details_frame, text=f"type: {item['type']}", font=("Helvetica", 14), bg="white", fg="black")
+                type_label.pack(anchor=tk.W)
+
+                #size details
+                size_label = tk.Label(self.details_frame, text=f"Size: {item['size']}", font=("Helvetica", 14), bg="white", fg="black")
+                size_label.pack(anchor=tk.W)
+
+        # confirm Order button
+        c_email = self.user[6]
+        print(c_email)
+        order_button = tk.Button(order_frame, text="Confirm order", command=lambda: self.place_order_to_db(c_email))
+        order_button.pack(pady=10)
+
+    #function to place order and generate a invoice
+    def place_order_to_db(self,c_email):
+
+        
+
+        #connect to the database
+        con = sql.connect(host = "localhost", user = "root", password = "0139612345", database = "login_details")
+        cursor = con.cursor()
+        #create a table for orders
+        cursor.execute("CREATE TABLE IF NOT EXISTS orders (order_id INT AUTO_INCREMENT PRIMARY KEY, shoe_name VARCHAR(100) NOT NULL, shoe_price VARCHAR(100) NOT NULL,shoe_type VARCHAR(100) NOT NULL, shoe_image VARCHAR(100) NOT NULL, shoe_size VARCHAR(100) NOT NULL)")
+        #insert the cart items into the orders table
+        for item in self.cart_items:
+            cursor.execute("INSERT INTO orders (shoe_name, shoe_price, shoe_type, shoe_image,shoe_size) VALUES (%s, %s, %s, %s, %s)", (item["name"], item["price"], item["type"], item["image_path"], item["size"]))
+        con.commit()
+        con.close()
+        #generate an invoice
+        self.generate_invoice(c_email)
+        #clear the cart items
+        self.cart_items = []
+        #display a message
+        mb.showinfo("Success", "Order placed successfully")
+        #destroy the cart frame
+        self.cart_frame.destroy()
+        #display the catalog
+        self.catalog()
+
+    #function to generate an invoice
+    def generate_invoice(self, user_email):
+    # Create a PDF invoice
+        pdf = FPDF()
+        pdf.add_page()
+        pdf.set_font("Arial", size=12)
+        pdf.cell(200, 10, "Invoice", ln=True, align='C')
+        pdf.cell(200, 10, f"User Email: {user_email}", ln=True)
+        for idx, item in enumerate(self.cart_items):
+            pdf.cell(200, 10, f"Item {idx + 1}: {item['name']}, Price: {item['price']}", ln=True)
+        pdf.output("invoice.pdf")
+
+        # Email the invoice
+        from_email = "bharadwajkumar99@gmail.com"
+        password = "wdrftjlybbgzmjbi"
+        to_email = user_email
+
+        msg = MIMEMultipart()
+        msg['From'] = from_email
+        msg['To'] = to_email
+        msg['Subject'] = "Invoice for your order"
+
+        body = "Please find attached the invoice for your order."
+        msg.attach(MIMEText(body, 'plain'))
+
+        filename = "invoice.pdf"
+        attachment = open(filename, "rb")
+
+        part = MIMEBase('application', 'octet-stream')
+        part.set_payload((attachment).read())
+        encoders.encode_base64(part)
+        part.add_header('Content-Disposition', "attachment; filename= %s" % filename)
+
+        msg.attach(part)
+
+        server = smtplib.SMTP('smtp.gmail.com', 587)
+        server.starttls()
+        server.login(from_email, password)
+        text = msg.as_string()
+        server.sendmail(from_email, to_email, text)
+        server.quit()
+
+        print("Invoice sent successfully")
+
+        #download the invoice
+        file_path = filedialog.asksaveasfilename(defaultextension=".pdf", filetypes=[("PDF files", "*.pdf")])
+
+    # Save the PDF invoice
+        if file_path:
+            pdf.output(file_path)
+            print("Invoice saved successfully")
+        else:
+            print("Invoice not saved")
+
+        #invoice saved and sent to your  your email successfully 
+        #display email id of the user in the message
+        mb.showinfo("Success", f"Invoice saved and sent to {user_email} successfully")
+            
+
+
+    
+
+    
+
+    
+        
+    #function to delete a product from the catalog
+    def delete_product(self, shoe_name):
+        con = sql.connect(host="localhost", user="root", password="0139612345", database="login_details")
+        cursor=con.cursor()
+        cursor.execute("DELETE FROM catalog WHERE shoe_name = %s", (shoe_name,))
+        con.commit()
+        con.close()
+        mb.showinfo("Success", "Shoe deleted from catalog")
+        #clear the catalog and display the updated catalog
+        self.catalog()
+
+
+
+
 
 
 
 
         
-
-
-   # if username == "" or password == "" :
-     #  mb.showinfo(title = "Fields are empty",message="create a username and password for your account" )
-    #else:
-      #   mb.showinfo(title = "create an account",message="create a username and password for your account" )
-
-#Main Window
-# '''root = tk.Tk()
-# root.title("Welcome to flipzon")
-# root.geometry("1540x800")
-# root.configure(bg="white")
-# root.attributes('-alpha', 1)
-
-# img = Image.open("/Users/bhardwaj/Documents/pictures for project/_defd105c-4bb3-46e3-826a-562cc387d98e.jpeg")
-# resized_image = img.resize((1530, 800), Image.LANCZOS)
-# image_tk = ImageTk.PhotoImage(resized_image)
-# background_label = tk.Label(root, image=image_tk)
-# background_label.image = image_tk  # Keep a reference
-# background_label.place(x=0, y=0, relwidth=1, relheight=1)'''
-
-# '''img = ImageTk.PhotoImage(Image.open("/Users/bhardwaj/Documents/pictures for project/force-majeure-du8AbwM5z2g-unsplash.jpg"))
-# tk.Label(root, image=img).place(relheight=1, relwidth=1)'''
 
 if __name__ == "__main__":
     root = tk.Tk()
-    app = flipzon(root)
+    app = walkwise(root)
     
     # app.l_frame()
     # app.c_frame()
