@@ -1,3 +1,4 @@
+import shutil
 import tkinter as tk
 from tkinter import messagebox as mb
 import mysql.connector as sql
@@ -14,6 +15,9 @@ from email.mime.text import MIMEText
 from email.mime.base import MIMEBase
 from email import encoders
 from fpdf import FPDF
+import webbrowser
+import xlsxwriter
+
 
 conn = sql.connect(
     host="localhost",
@@ -49,12 +53,12 @@ class walkwise:
     def __init__(self,root):
         self.root = root
         self.root.title("Welcome to Walkwise")
-        self.root.geometry("1040x900")
+        self.root.geometry("1300x700")
         self.root.configure(bg="white")
         self.root.attributes('-alpha', 1)
         #self.image_tk = None
 
-        img = Image.open("/Users/bhardwaj/Documents/pictures for project/PhotoGrid_Plus_1707021941021.png")
+        img = Image.open("/Users/bhardwaj/Downloads/loginpage.jpg")
         resized_image = img.resize((1035, 850), Image.LANCZOS)
         image_tk = ImageTk.PhotoImage(resized_image)
 
@@ -76,18 +80,106 @@ class walkwise:
         self.background_label = tk.Label(root)
         self.background_label.place(x=0, y=0, relwidth=1, relheight=1)
 
-        self.login_frame=tk.Frame(root, bg="white")
-        #login_frame.place(x=0,y=0,relheight=1, relwidth=1)
-        #login_frame.attributes('-alpha', 0.9)
-        self.login_label = tk.Label(self.login_frame, text="Provide Your Login Details",bg="white",fg="black",font=("Calibri","20"))
-        self.login_label.grid(row=0,column=2,columnspan=5,pady=10)
-        self.login_username_label= tk.Label(self.login_frame, text="Username",bg="white",fg="black",font=("Calibri","15","bold"),pady=5)
-        self.login_username_entry= tk.Entry(self.login_frame)
-        self.login_password_label= tk.Label(self.login_frame, text="Password",bg="white",fg="black",font=("Calibri","15","bold"))
-        self.login_password_entry= tk.Entry(self.login_frame,show="*")
-        self.login_button = Button(self.login_frame, text="Login",bg="sky blue",fg="black",command=self.login,highlightbackground="grey",borderless=1)
-        self.forgot_password_button = Button(self.login_frame, text="Forgot password?",bg="light green",fg="black",command=self.show_forgot_password_screen,highlightbackground="grey",borderless=1)
-        self.createacc_button= Button(self.login_frame, text="New User? Create Your account",bg="light green",fg="black",command=self.show_create_account_screen,highlightbackground="grey",borderless=1)
+        self.login_frame=tk.Frame(root, bg="#020c11")
+        #place login frame on right side of the screen
+        self.login_frame.place(x=800,y=150,width=400)
+        
+#         #adding login text on the top
+#         self.login_label = tk.Label(self.login_frame, text="Login", font=("calibri", 20, "bold"), bg="white", fg="black")
+#         self.login_label.place(x=850, y=200)
+        
+#         #adding username label
+#         self.username_label = tk.Label(self.login_frame, text="_", font=("calibri", 18, "bold"), bg="black", fg="WHITE") 
+#         self.username_label.place(x=760, y=270)
+#         #adding password label
+#         self.password_label = tk.Label(self.login_frame, text="_____", font=("calibri", 18, "bold"), bg="black", fg="WHITE")
+#         self.password_label.place(x=760, y=340)
+        
+#         #adding password entry
+#         self.password_entry = tk.Entry(self.login_frame,font=("calibri", 18), bg="black", width=28, bd=0,fg="white", relief="ridge",insertbackground="white")
+#         self.password_entry.place(x=765, y=325)
+#         self.password_entry.insert(0, "Password")
+#         self.password_entry.bind('<FocusIn>', self.removepasswordtext)
+#         self.password_entry.bind('<FocusOut>', self.removepasswordtext)
+    
+#         #adding username entry
+#         self.username_entry = tk.Entry(self.login_frame,font=("calibri", 18), bg="black", width= 28, bd=0,fg="white", relief="ridge",insertbackground="white")
+#         self.username_entry.place(x=765, y=260)
+#         self.username_entry.insert(0, "Email")
+#         #self.username_entry.bind("<Key>", self.removeusernametext)
+#         self.username_entry.bind('<FocusIn>', self.removeusernametext)
+#         self.username_entry.bind('<FocusOut>', self.removeusernametext)
+        
+#         #adding show password icon
+#         show_icon_image = Image.open("/Users/bhardwaj/Downloads/WhatsApp Image 2024-03-26 at 12.46.45 AM (1).jpeg")
+#         show_icon_resized = show_icon_image.resize((30, 30), Image.Resampling.LANCZOS)  
+#         self.show_icon = ImageTk.PhotoImage(show_icon_resized)
+
+#         # Open and resize the hide icon
+#         hide_icon_image = Image.open("/Users/bhardwaj/Downloads/WhatsApp Image 2024-03-26 at 12.46.45 AM.jpeg")
+#         hide_icon_resized = hide_icon_image.resize((30, 30), Image.Resampling.LANCZOS)  
+#         self.hide_icon = ImageTk.PhotoImage(hide_icon_resized)
+
+
+#         # Create a button to toggle password visibility
+#         self.toggle_button = tk.Button(self.login_frame, image=self.show_icon, command=self.toggle_password_visibility, borderwidth=0,highlightthickness=0, bg="black", activebackground="black")
+#         self.toggle_button.place(x=1050, y=330)
+        
+        
+#         #adding login button
+#         self.login_button = Button(self.login_frame, text="Login", font=("calibri",18,"bold"), bg="black", fg="white", bd=0, cursor="hand2",activebackground="black",activeforeground="grey", command=self.login)
+#         self.login_button.place(x=800, y=400)
+#         #adding signup button
+#         self.signup_button = Button(self.login_frame, text="Sign Up", font=("calibri",18,"bold"), bg="black", fg="white", bd=0, cursor="hand2",activebackground="black",activeforeground="grey",command=self.show_create_account_screen)
+#         self.signup_button.place(x=950, y=400)
+#         #adding forgot password button
+#         self.login_forgot_password_button = Button(self.login_frame, text="Forgot Password?", font=("calibri",10,"bold"), bg="black", fg="light blue", bd=0, cursor="hand2",activebackground="black",activeforeground="grey")
+#         self.login_forgot_password_button.place(x=960, y=380)
+#         self.login_forgot_password_button.config(command=self.show_create_account_screen)
+
+        
+        self.update_background_image("/Users/bhardwaj/Downloads/loginpage.jpg")
+# #method for show and hide password icon
+#     def toggle_password_visibility(self):
+#         if self.password_visible:
+#             # Hide the password and update the button icon
+#             self.password_entry.config(show="*")
+#             self.toggle_button.config(image=self.show_icon)
+#             self.password_visible = False
+#         else:
+#             # Show the password and update the button icon
+#             self.password_entry.config(show="")
+#             self.toggle_button.config(image=self.hide_icon)
+#             self.password_visible = True
+    
+#     #creating entry lable inside the username entry
+#     def removeusernametext(self, event):
+#         if self.username_entry.get() == "Email":
+#             self.username_entry.delete(0, "end")
+#             self.username_entry.config(fg="white")
+#         elif self.username_entry.get() == "":
+#             self.username_entry.insert(0, "Email")
+#             self.username_entry.config(fg="white") 
+#     def removepasswordtext(self, event):
+#         if self.password_entry.get() == "Password":
+#             self.password_entry.delete(0, "end")
+#             self.password_entry.config(fg="white")
+#             self.password_entry.config(show="*")
+#         elif self.password_entry.get() == "":
+#             self.password_entry.insert(0, "Password")
+#             self.password_entry.config(show="")
+#             self.password_entry.config(fg="white")
+        # login_frame.place(x=0,y=0,relheight=1, relwidth=1)
+        # login_frame.attributes('-alpha', 0.9)
+        self.login_label = tk.Label(self.login_frame, text="Login",bg="#020c11",fg="white",font=("Calibri","70"))
+        self.login_label.grid(row=0,column=2,padx=5,pady=10,sticky="w")
+        self.login_username_label= tk.Label(self.login_frame, text="Username",bg="#020c11",fg="white",font=("Calibri","25","bold"),pady=5)
+        self.login_username_entry= tk.Entry(self.login_frame,font=("Calibri","15"))    
+        self.login_password_label= tk.Label(self.login_frame, text="Password",bg="#020c11",fg="white",font=("Calibri","25","bold"))
+        self.login_password_entry= tk.Entry(self.login_frame,show="*",font=("Calibri","15"))
+        self.login_button = Button(self.login_frame, text="Login",bg="#020c11",fg="white",command=self.login,highlightbackground="grey",borderless=1,font=("Calibri","20"))
+        self.forgot_password_button = Button(self.login_frame, text="Forgot password?",bg="#020c11",fg="white",command=self.show_forgot_password_screen,highlightbackground="grey",borderless=1,font=("Calibri","15"))
+        self.createacc_button= Button(self.login_frame, text="New User? Create Your account",bg="#020c11",fg="white",command=self.show_create_account_screen,highlightbackground="grey",borderless=1,font=("Calibri","15"))
 
         self.login_username_label.grid(row=1,column=1)
         self.login_username_entry.grid(row=1, column=2)
@@ -95,13 +187,14 @@ class walkwise:
         self.login_password_entry.grid(row=2,column=2)
         self.login_button.grid(row=3,column=2,pady="10")
         self.forgot_password_button.grid(row=4,column=2,padx=5)
+        # self.createacc_button.place(x=10, y=170, width=200, height=30)
+
         self.createacc_button.grid(row=7,column=2,columnspan=3,pady="10")
         #self.l_frame()
         #self.destroy_background_image()
         # self.create_account_frame.pack_forget()
         # self.forgot_password_frame.pack_forget()
-        self.login_frame.place(x=327,y=230,width=390)
-        self.update_background_image("/Users/bhardwaj/Documents/pictures for project/PhotoGrid_Plus_1707021941021.png")
+        
         #self.login_frame.pack() 
 
     def show_create_account_screen(self):
@@ -151,7 +244,7 @@ class walkwise:
         # self.frame1=Frame(self.app,width=700,height=450,bg="white")
         # self.frame1.place(x=180,y=90)
 
-        self.update_background_image("/Users/bhardwaj/Documents/pictures for project/PhotoGrid_Plus_1707024804464.png")
+        self.update_background_image("/Users/bhardwaj/Downloads/WhatsApp Image 2024-03-28 at 10.39.25 PM.jpeg")
 
     def show_forgot_password_screen(self):
         #self.destroy_background_image()
@@ -183,7 +276,7 @@ class walkwise:
         self.flogin_button.grid(row=5,column=0,columnspan=2,pady="10")
         self.flogin_back_login_button.grid(row=6,column=0,columnspan=3)
         self.forgot_password_frame.place(x=327,y=280,width=390)
-        self.update_background_image("/Users/bhardwaj/Downloads/_0f134ab2-ff1b-491d-94e7-a7b0e40ac860.jpeg")
+        self.update_background_image("/Users/bhardwaj/Downloads/WhatsApp Image 2024-03-28 at 10.33.10 PM.jpeg")
 
 #Function to create account
     def create_account(self):
@@ -195,7 +288,22 @@ class walkwise:
         c_username=self.create_username_entry.get()
         c_password=self.create_password_entry.get()
 
-        if c_username == "" or c_password == "" :
+        #email validation
+        if not re.match(r"[^@]+@[^@]+\.[^@]+", c_email):
+            mb.showinfo(title="Invalid Email", message="Please enter a valid email address")
+        
+
+        #password validation for length and special characters
+        elif not re.match(r"^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$", c_password):
+            mb.showinfo(title="Invalid Password", message="Password must contain at least 8 characters, one letter, one number and one special character")
+        
+            
+        #phone number validation
+        elif not re.match(r"[0-9]{10}", c_phone) and len(c_phone) != 10:
+            mb.showinfo(title="Invalid Phone Number", message="Please enter a valid phone number")
+        
+
+        elif c_username == "" or c_password == "" :
             mb.showinfo(title = "Fields are empty",message="create a username and password for your account" )
         else:
             con = sql.connect(host="localhost", user="root", password="0139612345", database="login_details")
@@ -266,11 +374,14 @@ class walkwise:
             confirm_new_password = self.flogin_confirm_password_entry.get()
             if f_username and f_password and confirm_new_password:
                 if f_password == confirm_new_password:
+                    if not re.match(r"^(?=.*[A-Za-z])(?=.*\d)(?=.*[@$!%*#?&])[A-Za-z\d@$!%*#?&]{8,}$", f_password):
+                        mb.showinfo(title="Invalid Password", message="Password must contain at least 8 characters, one letter, one number and one special character")
+                    else:
                     #try:
                     #cursor = con.cursor()
-                    cursor.execute("UPDATE user_details SET password=%s WHERE username=%s", (f_password, f_username))
-                    con.commit()
-                    mb.showinfo("Success", "Password updated successfully")
+                        cursor.execute("UPDATE user_details SET password=%s WHERE username=%s", (f_password, f_username))
+                        con.commit()
+                        mb.showinfo("Success", "Password updated successfully")
                     #self.login_page()
                 #except Error as e:
                     #mb.showerror("Error", e)
@@ -279,14 +390,14 @@ class walkwise:
             else:
                 mb.showerror("Error", "All fields are required")
         else:
-            mb.showerror("Error", "Invalid Email")
+            mb.showerror("Error", "Invalid username")
                     
         con.close()
 
 
     def update_background_image(self,image_path):
         img = Image.open(image_path)
-        resized_image = img.resize((1035, 850), Image.LANCZOS)
+        resized_image = img.resize((1295, 695), Image.LANCZOS)
         image_tk = ImageTk.PhotoImage(resized_image)
         self.background_label.configure(image=image_tk)
         self.background_label.image = image_tk
@@ -301,15 +412,15 @@ class walkwise:
             
         self.background_label = tk.Label(root)
         self.background_label.place(x=0, y=0, relwidth=1, relheight=1)
-        self.update_background_image("/Users/bhardwaj/Documents/pictures for project/_8411470f-cb7e-4dce-9e7c-6284cc604605.jpeg")
+        self.update_background_image("/Users/bhardwaj/Downloads/WhatsApp Image 2024-04-08 at 2.14.33 PM.jpeg")
         
-        self.admin_frame=tk.Frame(root,bg="black")
-        self.admin_label = tk.Label(self.admin_frame, text="Welcome to Admin Page",font=("Helvetica",20,"bold"),bg="black",fg="white")
+        self.admin_frame=tk.Frame(root,bg="#232323")
+        self.admin_label = tk.Label(self.admin_frame, text="Welcome to Admin Page",font=("Helvetica",20,"bold"),bg="#232323",fg="white")
         self.admin_label.grid(row=0,column=0,columnspan=5,pady=10,sticky="w")
         
-        self.admin_shoe_name_label= tk.Label(self.admin_frame, text="Shoe Name",bg="black",fg="azure",font=("Calibri","15","bold"))
+        self.admin_shoe_name_label= tk.Label(self.admin_frame, text="Shoe Name",bg="#232323",fg="azure",font=("Calibri","15","bold"))
         self.admin_shoe_name_entry= tk.Entry(self.admin_frame)
-        self.admin_shoe_price_label= tk.Label(self.admin_frame, text="Shoe Price",bg="black",font=("Calibri","15","bold"))
+        self.admin_shoe_price_label= tk.Label(self.admin_frame, text="Shoe Price",bg="#232323",font=("Calibri","15","bold"))
         self.admin_shoe_price_entry= tk.Entry(self.admin_frame)
         #dropdown menu for shoe type
         options = {'men','women','kids'}
@@ -317,12 +428,12 @@ class walkwise:
         self.admin_shoe_type_option.set('Select Shoe Type')
         self.admin_shoe_type_option_menu = tk.OptionMenu(self.admin_frame, self.admin_shoe_type_option, *options)
         self.admin_shoe_type_option_menu.config(width=15)
-        self.admin_shoe_type_label= tk.Label(self.admin_frame, text="Shoe Type",bg="black",font=("Calibri","15","bold"))
+        self.admin_shoe_type_label= tk.Label(self.admin_frame, text="Shoe Type",bg="#232323",font=("Calibri","15","bold"))
         self.admin_shoe_type_option_menu.grid(row=3,column=1)
 
         # self.admin_shoe_type_label= tk.Label(self.admin_frame, text="Shoe Type",bg="black",font=("Calibri","15","bold"))
         # self.admin_shoe_type_entry= tk.Entry(self.admin_frame)
-        self.admin_shoe_image_label= tk.Label(self.admin_frame, text="Shoe Image",bg="black",font=("Calibri","15","bold"))
+        self.admin_shoe_image_label= tk.Label(self.admin_frame, text="Shoe Image",bg="#232323",font=("Calibri","15","bold"))
         self.admin_shoe_image_button= Button(self.admin_frame, text="Upload Image",bg="yellow",command=self.upload_image,highlightbackground="black",borderless=1)
         self.admin_add_to_catalog_button = Button(self.admin_frame, text="Add to Catalog",bg="yellow",command=self.add_to_catalog,highlightbackground="black",borderless=1)
         self.admin_catalog_button = Button(self.admin_frame, text="Catalog",bg="yellow",command=self.catalog,highlightbackground="black",borderless=1)
@@ -339,7 +450,7 @@ class walkwise:
         self.admin_catalog_button.grid(row=6,column=0,columnspan=2,pady="10")
 
 
-        self.admin_frame.place(x=327,y=230)
+        self.admin_frame.place(x=430,y=230,width=400,height=300)
         #self.admin_frame.pack()
 
     #upload image
@@ -364,7 +475,7 @@ class walkwise:
         shoe_name=self.admin_shoe_name_entry.get()
         shoe_price=self.admin_shoe_price_entry.get()
         shoe_type=self.admin_shoe_type_option.get()
-        shoe_image=self.filename
+        shoe_image=self.filename    
         print(shoe_name, shoe_price,shoe_type, shoe_image)
 
         con = sql.connect(host="localhost", user="root", password="0139612345", database="login_details")
@@ -459,6 +570,12 @@ class walkwise:
                 catalog_shoe_button = tk.Button(self.frame3, image=photo, command=lambda shoe=shoe: self.show_shoe_details(shoe))
                 catalog_shoe_button.image = photo
                 catalog_shoe_button.grid(row=row, column=col, padx=5, pady=5)
+
+    #lopout button
+        logout_button = tk.Button(self.root, text="logout", command=self.show_login)
+        logout_button.place(x=10, y=10)
+        
+
     
     #view cart icon
         cart_image = Image.open("/Users/bhardwaj/Documents/pictures for project/cart.png")
@@ -468,21 +585,76 @@ class walkwise:
         cart_button.image = cart_photo
         cart_button.place(x=950, y=10)
 
+        #report button if admin is logged in
+        if self.user[3] == "admin":
+            report_button = tk.Button(self.root, text="Report", command=self.report)
+            report_button.place(x=1100, y=10)
+
+    def report(self):
+        con = sql.connect(host="localhost", user="root", password="0139612345", database="login_details")
+        cursor = con.cursor()
+        cursor.execute("SELECT * FROM catalog")
+        shoes = cursor.fetchall()
+        con.close()
+
+        # Create a new workbook and add a worksheet
+        workbook = xlsxwriter.Workbook("catalog.xlsx")
+        worksheet = workbook.add_worksheet()
+
+        # Add a bold format to use to highlight cells
+        bold = workbook.add_format({"bold": True})
+
+        # Write some data headers
+        worksheet.write("A1", "Shoe ID", bold)
+        worksheet.write("B1", "Shoe Name", bold)
+        worksheet.write("C1", "Shoe Price", bold)
+        worksheet.write("D1", "Shoe Type", bold)
+        worksheet.write("E1", "Shoe Image", bold)
+
+        # Start from the first cell below the headers
+        row = 1
+        col = 0
+
+        # Iterate over the data and write it out row by row
+        for shoe in shoes:
+            worksheet.write(row, col, shoe[0])
+            worksheet.write(row, col + 1, shoe[1])
+            worksheet.write(row, col + 2, shoe[2])
+            worksheet.write(row, col + 3, shoe[3])
+            worksheet.write(row, col + 4, shoe[4])
+            row += 1
+            
+        workbook.close()
+        mb.showinfo("Success", "Report generated successfully")
+
+        #ask location to save the file and download the file
+        file_path = filedialog.asksaveasfilename(defaultextension=".xlsx", filetypes=[("Excel files", "*.xlsx")])
+        if file_path:
+            shutil.move("catalog.xlsx", file_path)
+            mb.showinfo("Success", "Report downloaded successfully")
+            
+
+
+        
+
+        
+
+
 
     def show_shoe_details(self, shoe):
         
         
-        shoe_details_frame = tk.Frame(self.root, bg="#f3e7c4")
+        shoe_details_frame = tk.Frame(self.root, bg="black")
         shoe_details_frame.place(x=0, y=0, relwidth=1, relheight=1)
         # Load the background image
-        bg_image = Image.open("/Users/bhardwaj/Documents/pictures for project/JPEG image-4FFE-866D-43-0.jpeg")
-        bg_image = bg_image.resize((1035, 850), Image.LANCZOS)  # Adjust the size as needed
-        bg_photo = ImageTk.PhotoImage(bg_image)
+        # bg_image = Image.open("/Users/bhardwaj/Documents/pictures for project/JPEG image-4FFE-866D-43-0.jpeg")
+        # bg_image = bg_image.resize((1035, 850), Image.LANCZOS)  # Adjust the size as needed
+        # bg_photo = ImageTk.PhotoImage(bg_image)
 
-        # Create a label with the background image
-        bg_label = tk.Label(shoe_details_frame, image=bg_photo)
-        bg_label.image = bg_photo
-        bg_label.place(x=0, y=0, relwidth=1, relheight=1)
+        # # Create a label with the background image
+        # bg_label = tk.Label(shoe_details_frame, image=bg_photo)
+        # bg_label.image = bg_photo
+        # bg_label.place(x=0, y=0, relwidth=1, relheight=1)
 
         # #display shoe deatils to the right of the image
         # shoe_name_label = tk.Label(shoe_details_frame, text=shoe["shoe_name"], font=("Helvetica", 20, "bold"), bg="black", fg="white")
@@ -503,13 +675,13 @@ class walkwise:
         # add_to_cart_button.pack(pady=10)
         # back_button = tk.Button(shoe_details_frame, text="Back", command=shoe_details_frame.destroy)
         # back_button.pack(pady=10)
-        shoe_name_label = tk.Label(shoe_details_frame, text=shoe["shoe_name"], font=("Calibri", 52, "bold","italic"), bg="#f3e7c4",fg="black")
+        shoe_name_label = tk.Label(shoe_details_frame, text=shoe["shoe_name"], font=("Calibri", 52, "bold","italic"), bg="black",fg="white")
         shoe_name_label.place(x=550, y=170)
 
-        shoe_price_label = tk.Label(shoe_details_frame, text=shoe["shoe_price"], font=("Calibri", 30, "bold"), bg="#f3e7c4", fg="black")
+        shoe_price_label = tk.Label(shoe_details_frame, text=shoe["shoe_price"], font=("Calibri", 30, "bold"), bg="black", fg="white")
         shoe_price_label.place(x=550, y=270)
 
-        shoe_type_label = tk.Label(shoe_details_frame, text=shoe["shoe_type"], font=("Calibri", 20, "bold"), bg="#f3e7c4", fg="black")
+        shoe_type_label = tk.Label(shoe_details_frame, text=shoe["shoe_type"], font=("Calibri", 20, "bold"), bg="black", fg="white")
         shoe_type_label.place(x=550, y=330)
 
         #dropdown for shoe size
@@ -529,15 +701,16 @@ class walkwise:
         self.shoe_size_label= tk.Label(shoe_details_frame, text="Shoe Size", font=("Calibri","15","bold"), bg="gray", fg="white",highlightbackground="#f3e7c4")
         self.shoe_size_option_menu.place(x=550, y=390)
 
-        
-        
-
+        #size chart hyperlink with underline
+        size_chart_label = tk.Label(shoe_details_frame, text="Size Chart", font=("Calibri", 15, "underline","bold"), bg="black", fg="white",highlightbackground="#f3e7c4")
+        size_chart_label.place(x=550, y=420)
+        size_chart_label.bind("<Button-1>", lambda e: webbrowser.open_new("https://www.shoecarnival.com/content/sizechart"))
 
         add_to_cart_button = Button(shoe_details_frame, text="Add to Cart",bg="gray",borderless=1, command=lambda: self.handle_add_to_cart(shoe["shoe_name"], shoe["shoe_price"], shoe["shoe_type"], shoe["shoe_image"]),highlightbackground="#f3e7c4")
-        add_to_cart_button.place(x=580, y=420)
+        add_to_cart_button.place(x=550, y=470)
 
         back_button = Button(shoe_details_frame, text="Back",bg="gray", command=shoe_details_frame.destroy,highlightbackground="#f3e7c4",borderless=1)
-        back_button.place(x=580, y=470)
+        back_button.place(x=550, y=520)
 
         #continue shopping button
         # continue_shopping_button = Button(shoe_details_frame, text="Continue Shopping",bg="gray", command=self.catalog,highlightbackground="#f3e7c4",borderless=1)
@@ -545,7 +718,7 @@ class walkwise:
 
         #view cart button
         view_cart_button = Button(shoe_details_frame, text="View Cart",bg="gray", command=self.cart,highlightbackground="#f3e7c4",borderless=1)
-        view_cart_button.place(x=580, y=570)
+        view_cart_button.place(x=550, y=570)
         # view_cart_button = Button(shoe_details_frame, text="View Cart",bg="gray", command=self.cart ,highlightbackground="#f3e7c4",borderless=1)
         # view_cart_button.place(x=580, y=570)
 
@@ -677,6 +850,15 @@ class walkwise:
 
                           
 
+
+
+
+
+
+
+
+
+
      
     #order page function
     def place_order(self):
@@ -751,8 +933,11 @@ class walkwise:
     # Create a PDF invoice
         pdf = FPDF()
         pdf.add_page()
-        pdf.set_font("Arial", size=12)
+        pdf.set_font("Arial", style="B", size=24)
+        pdf.set_text_color(0, 0, 255)  # Blue color
         pdf.cell(200, 10, "Invoice", ln=True, align='C')
+        pdf.set_font("Arial", size=12)
+        pdf.set_text_color(0, 0, 0)
         pdf.cell(200, 10, f"User Email: {user_email}", ln=True)
         for idx, item in enumerate(self.cart_items):
             pdf.cell(200, 10, f"Item {idx + 1}: {item['name']}, Price: {item['price']}", ln=True)
